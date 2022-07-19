@@ -1,0 +1,12 @@
+# Automatically generated #
+.metadata
+.settings
+
+# Binaries #
+target
+*.class
+
+# Package Files #
+*.jar
+
+/bin/
