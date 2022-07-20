@@ -3,10 +3,41 @@
   
   <groupId>io.github.homebeaver</groupId>
   <artifactId>trident</artifactId>
-  <version>1.4.1-SNAPSHOT</version>
+  <version>1.4.1</version>
+  
+  <url>https://github.com/homebeaver/trident</url>
+  <developers>
+	<developer>
+		<name>Kirill Grouchnikov</name>
+	</developer>
+	<developer>
+		<name>Eugen H</name>
+	</developer>
+  </developers>
+  
+  <scm>
+  	<url>https://github.com/homebeaver/trident</url>
+  	<connection>scm:git:https://github.com/homebeaver/trident.git</connection>
+  	<developerConnection>scm:git:https://github.com/homebeaver/</developerConnection>
+  </scm>
+  
   <name>Trident animation library</name>
   <description>This is a salvage of pushingpixels trident jar</description>
   <inceptionYear>2011</inceptionYear>
+  
+  <licenses>
+    <license>
+      <name>BSD license</name>
+      <url>https://opensource.org/licenses/bsd-license.php</url>
+    </license>
+  </licenses>
+	
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
   
   <build>
     <plugins>
@@ -19,6 +50,19 @@
           <target>8</target>
         </configuration>
       </plugin>
+      
+	  <!-- see https://central.sonatype.org/publish/publish-maven/#distribution-management-and-authentication -->
+	  <plugin>
+	    <groupId>org.sonatype.plugins</groupId>
+	    <artifactId>nexus-staging-maven-plugin</artifactId>
+	    <version>1.6.13</version>
+	    <extensions>true</extensions>
+	    <configuration>
+	      <serverId>ossrh</serverId>
+	      <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+	      <autoReleaseAfterClose>true</autoReleaseAfterClose>
+	    </configuration>
+	  </plugin> 
     </plugins>
   </build>
   
@@ -30,4 +74,5 @@
   		<scope>test</scope>
   	</dependency>
   </dependencies>
+  
 </project>
