@@ -72,16 +72,16 @@ public class HelloWorldTest extends junit.framework.TestCase {
 		// last is still 1.0
 		assertTrue(1f==helloWorld.getLast());
 		
-		System.out.println("\n next test waiting " + DURATION + "ms is NOT long enough:");
-		timeline.play();
+		System.out.println("\n playReverse - waiting " + DURATION + "ms will be NOT long enough:");
+		timeline.playReverse();;
 		try {
 			Thread.sleep(DURATION);
-			assertEquals(Timeline.TimelineState.PLAYING_FORWARD, timeline.getState());
+			assertEquals(Timeline.TimelineState.PLAYING_REVERSE, timeline.getState());
 	        System.out.println(" not finished: timeline.getState() " + timeline.getState());
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertTrue(1f>helloWorld.getLast());
+		assertTrue(0f<helloWorld.getLast()); // last is NOT 0 because playing not finished
 		
 	}
 
