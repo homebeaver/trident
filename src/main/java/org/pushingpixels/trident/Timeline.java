@@ -109,8 +109,8 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
     }
 
     public enum TimelineState {
-        IDLE(false), READY(false), PLAYING_FORWARD(true), PLAYING_REVERSE(true), 
-        SUSPENDED(false), CANCELLED(false), DONE(false);
+        IDLE(false), READY(false), PLAYING_FORWARD(true), PLAYING_REVERSE(true), SUSPENDED(
+                false), CANCELLED(false), DONE(false);
 
         private boolean isActive;
 
@@ -186,7 +186,8 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         private void handleStateChange(final TimelineCallback callback,
                 final TimelineState oldState, final TimelineState newState,
                 final float durationFraction, final float timelinePosition) {
-            // special handling for chained callbacks not running on UI thread
+            // special handling for chained callbacks not running on UI
+            // thread
             boolean shouldRunOnUIThread = false;
             Class<?> clazz = callback.getClass();
             while ((clazz != null) && !shouldRunOnUIThread) {
@@ -215,7 +216,8 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
                 return;
             }
 
-            handleStateChange(this.setterCallback, oldState, newState, durationFraction, timelinePosition);
+            handleStateChange(this.setterCallback, oldState, newState, durationFraction,
+                    timelinePosition);
             for (int i = this.callbacks.size() - 1; i >= 0; i--) {
                 handleStateChange(this.callbacks.get(i), oldState, newState, durationFraction,
                         timelinePosition);
@@ -224,7 +226,8 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
 
         private void handlePulse(final TimelineCallback callback, final float durationFraction,
                 final float timelinePosition) {
-            // special handling for chained callbacks not running on UI thread
+            // special handling for chained callbacks not running on UI
+            // thread
             boolean shouldRunOnUIThread = false;
             Class<?> clazz = callback.getClass();
             while ((clazz != null) && !shouldRunOnUIThread) {
@@ -235,11 +238,13 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
                 Timeline.this.uiToolkitHandler.runOnUIThread(mainObject, () -> {
                     if (Timeline.this.getState() == TimelineState.CANCELLED)
                         return;
-                    // System.err.println("Timeline @" + Timeline.this.hashCode());
+                    // System.err.println("Timeline @"
+                    // + Timeline.this.hashCode());
                     callback.onTimelinePulse(durationFraction, timelinePosition);
                 });
             } else {
-                // System.err.println("Timeline @" + Timeline.this.hashCode());
+                // System.err.println("Timeline @" +
+                // Timeline.this.hashCode());
                 callback.onTimelinePulse(durationFraction, timelinePosition);
             }
         }
