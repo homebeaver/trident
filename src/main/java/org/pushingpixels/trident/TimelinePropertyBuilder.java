@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2017 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -301,15 +301,18 @@ public class TimelinePropertyBuilder<T> {
                     getPropertySetter(obj, fieldName, propertySetter));
             this.propertyInterpolator = propertyInterpolator;
             this.to = to;
+            //System.out.println("Created @" + hashCode() + " for " + fieldName);
         }
 
         @Override
         void onStart() {
             this.from = getter.get(object, fieldName);
+            //System.out.println("onStart on @" + hashCode());
         }
 
         @Override
         void updateFieldValue(float timelinePosition) {
+            //System.out.println("updateFieldValue on @" + hashCode());
             try {
                 Object value = this.propertyInterpolator.interpolate(from, to, timelinePosition);
                 this.setter.set(this.object, this.fieldName, value);
