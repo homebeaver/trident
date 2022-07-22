@@ -3,7 +3,7 @@
   
   <groupId>io.github.homebeaver</groupId>
   <artifactId>trident</artifactId>
-  <version>1.5.00-SNAPSHOT</version>
+  <version>1.5.0</version>
   
   <url>https://github.com/homebeaver/trident</url>
   <developers>
