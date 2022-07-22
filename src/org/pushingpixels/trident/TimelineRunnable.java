@@ -27,34 +27,41 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package test;
+package org.pushingpixels.trident;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.TimelinePropertyBuilder.PropertySetter;
+import org.pushingpixels.trident.TimelineScenario.TimelineScenarioActor;
 
-public class CustomSetter {
-    private float value;
+public abstract class TimelineRunnable implements Runnable, TimelineScenarioActor {
+    private static ExecutorService service = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 10L,
+            TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
 
-    public static void main(String[] args) {
-        final CustomSetter helloWorld = new CustomSetter();
-        Timeline timeline = new Timeline(helloWorld);
-        PropertySetter<Float> propertySetter = (Object obj, String fieldName, Float value) -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("ss.SSS");
-            float oldValue = helloWorld.value;
-            System.out.println(sdf.format(new Date()) + " : " + oldValue + " -> " + value);
-            helloWorld.value = value;
-        };
-        timeline.addPropertyToInterpolate(
-                Timeline.<Float>property("value").from(0.0f).to(1.0f).setWith(propertySetter));
-        timeline.setDuration(300);
-        timeline.play();
+    private Future<?> future;
 
-        try {
-            Thread.sleep(1000);
-        } catch (Exception exc) {
-        }
+    @Override
+    public void play() {
+        this.future = service.submit(this);
+    }
+
+    @Override
+    public boolean isDone() {
+        if (this.future == null)
+            return false;
+        return this.future.isDone();
+    }
+
+    @Override
+    public boolean supportsReplay() {
+        return false;
+    }
+
+    @Override
+    public void resetDoneFlag() {
+        throw new UnsupportedOperationException();
     }
 }

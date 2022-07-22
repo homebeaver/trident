@@ -27,34 +27,30 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package test;
+package org.pushingpixels.trident.swing;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.awt.Component;
 
-import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.TimelinePropertyBuilder.PropertySetter;
+import javax.swing.SwingUtilities;
 
-public class CustomSetter {
-    private float value;
+import org.pushingpixels.trident.UIToolkitHandler;
 
-    public static void main(String[] args) {
-        final CustomSetter helloWorld = new CustomSetter();
-        Timeline timeline = new Timeline(helloWorld);
-        PropertySetter<Float> propertySetter = (Object obj, String fieldName, Float value) -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("ss.SSS");
-            float oldValue = helloWorld.value;
-            System.out.println(sdf.format(new Date()) + " : " + oldValue + " -> " + value);
-            helloWorld.value = value;
-        };
-        timeline.addPropertyToInterpolate(
-                Timeline.<Float>property("value").from(0.0f).to(1.0f).setWith(propertySetter));
-        timeline.setDuration(300);
-        timeline.play();
+public class SwingToolkitHandler implements UIToolkitHandler {
+    @Override
+    public boolean isHandlerFor(Object mainTimelineObject) {
+        return (mainTimelineObject instanceof Component);
+    }
 
-        try {
-            Thread.sleep(1000);
-        } catch (Exception exc) {
-        }
+    @Override
+    public boolean isInReadyState(Object mainTimelineObject) {
+        return ((Component) mainTimelineObject).isDisplayable();
+    }
+
+    @Override
+    public void runOnUIThread(Object mainTimelineObject, Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread())
+            runnable.run();
+        else
+            SwingUtilities.invokeLater(runnable);
     }
 }

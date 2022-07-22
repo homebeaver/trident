@@ -27,34 +27,22 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package test;
+package org.pushingpixels.trident.callback;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.pushingpixels.trident.Timeline.TimelineState;
 
-import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.TimelinePropertyBuilder.PropertySetter;
+/**
+ * Default implementation of {@link TimelineCallback} that does nothing.
+ * 
+ * @author Kirill Grouchnikov
+ */
+public class TimelineCallbackAdapter implements TimelineCallback {
+    @Override
+    public void onTimelineStateChanged(TimelineState oldState, TimelineState newState,
+            float durationFraction, float timelinePosition) {
+    }
 
-public class CustomSetter {
-    private float value;
-
-    public static void main(String[] args) {
-        final CustomSetter helloWorld = new CustomSetter();
-        Timeline timeline = new Timeline(helloWorld);
-        PropertySetter<Float> propertySetter = (Object obj, String fieldName, Float value) -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("ss.SSS");
-            float oldValue = helloWorld.value;
-            System.out.println(sdf.format(new Date()) + " : " + oldValue + " -> " + value);
-            helloWorld.value = value;
-        };
-        timeline.addPropertyToInterpolate(
-                Timeline.<Float>property("value").from(0.0f).to(1.0f).setWith(propertySetter));
-        timeline.setDuration(300);
-        timeline.play();
-
-        try {
-            Thread.sleep(1000);
-        } catch (Exception exc) {
-        }
+    @Override
+    public void onTimelinePulse(float durationFraction, float timelinePosition) {
     }
 }

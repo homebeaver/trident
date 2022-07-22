@@ -29,32 +29,26 @@
  */
 package test;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.TimelinePropertyBuilder.PropertySetter;
 
-public class CustomSetter {
+public class HelloWorld {
     private float value;
 
+    public void setValue(float newValue) {
+        System.out.println(this.value + " -> " + newValue);
+        this.value = newValue;
+    }
+
     public static void main(String[] args) {
-        final CustomSetter helloWorld = new CustomSetter();
+        HelloWorld helloWorld = new HelloWorld();
         Timeline timeline = new Timeline(helloWorld);
-        PropertySetter<Float> propertySetter = (Object obj, String fieldName, Float value) -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("ss.SSS");
-            float oldValue = helloWorld.value;
-            System.out.println(sdf.format(new Date()) + " : " + oldValue + " -> " + value);
-            helloWorld.value = value;
-        };
-        timeline.addPropertyToInterpolate(
-                Timeline.<Float>property("value").from(0.0f).to(1.0f).setWith(propertySetter));
-        timeline.setDuration(300);
+        timeline.addPropertyToInterpolate("value", 0.0f, 1.0f);
         timeline.play();
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (Exception exc) {
         }
+
     }
 }

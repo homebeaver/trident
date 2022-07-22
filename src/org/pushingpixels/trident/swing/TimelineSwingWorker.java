@@ -27,34 +27,26 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package test;
+package org.pushingpixels.trident.swing;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.swing.SwingWorker;
 
-import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.TimelinePropertyBuilder.PropertySetter;
+import org.pushingpixels.trident.TimelineScenario;
 
-public class CustomSetter {
-    private float value;
+public abstract class TimelineSwingWorker<T, V> extends SwingWorker<T, V>
+        implements TimelineScenario.TimelineScenarioActor {
+    @Override
+    public void play() {
+        this.execute();
+    }
 
-    public static void main(String[] args) {
-        final CustomSetter helloWorld = new CustomSetter();
-        Timeline timeline = new Timeline(helloWorld);
-        PropertySetter<Float> propertySetter = (Object obj, String fieldName, Float value) -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("ss.SSS");
-            float oldValue = helloWorld.value;
-            System.out.println(sdf.format(new Date()) + " : " + oldValue + " -> " + value);
-            helloWorld.value = value;
-        };
-        timeline.addPropertyToInterpolate(
-                Timeline.<Float>property("value").from(0.0f).to(1.0f).setWith(propertySetter));
-        timeline.setDuration(300);
-        timeline.play();
+    @Override
+    public boolean supportsReplay() {
+        return false;
+    }
 
-        try {
-            Thread.sleep(1000);
-        } catch (Exception exc) {
-        }
+    @Override
+    public void resetDoneFlag() {
+        throw new UnsupportedOperationException();
     }
 }
