@@ -1,46 +1,46 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <groupId>io.github.homebeaver</groupId>
-  <artifactId>trident</artifactId>
-  <version>1.5.2-SNAPSHOT</version>
-  
-  <url>https://github.com/homebeaver/trident</url>
-  <developers>
-	<developer>
-		<name>Kirill Grouchnikov</name>
-	</developer>
-	<developer>
-		<name>Eugen H</name>
-	</developer>
-  </developers>
-  
-  <scm>
-  	<url>https://github.com/homebeaver/trident</url>
-  	<connection>scm:git:https://github.com/homebeaver/trident.git</connection>
-  	<developerConnection>scm:git:https://github.com/homebeaver/</developerConnection>
-  </scm>
-  
-  <name>Trident animation library</name>
-  <description>This is a salvage of pushingpixels trident jar</description>
-  <inceptionYear>2011</inceptionYear>
-  
-  <licenses>
-    <license>
-      <name>BSD license</name>
-      <url>https://opensource.org/licenses/bsd-license.php</url>
-    </license>
-  </licenses>
-	
-  <distributionManagement>
-	<snapshotRepository>
-		<id>ossrh</id>
-		<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-	</snapshotRepository>
-  </distributionManagement>
-   
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>io.github.homebeaver</groupId>
+	<artifactId>trident</artifactId>
+	<version>1.5.2-SNAPSHOT</version>
+
+	<url>https://github.com/homebeaver/trident</url>
+	<developers>
+		<developer>
+			<name>Kirill Grouchnikov</name>
+		</developer>
+		<developer>
+			<name>Eugen H</name>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/homebeaver/trident</url>
+		<connection>scm:git:https://github.com/homebeaver/trident.git</connection>
+		<developerConnection>scm:git:https://github.com/homebeaver/</developerConnection>
+	</scm>
+
+	<name>Trident animation library</name>
+	<description>This is a salvage of pushingpixels trident jar</description>
+	<inceptionYear>2011</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>BSD license</name>
+			<url>https://opensource.org/licenses/bsd-license.php</url>
+		</license>
+	</licenses>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<build>
-	    <resources>
+		<resources>
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
 				<includes>
@@ -56,128 +56,128 @@
 			</resource>
 		</resources>
 
-	  <plugins>
+		<plugins>
 
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-compiler-plugin</artifactId>
-			<version>3.8.1</version>
-			<configuration>
-				<release>16</release>
-				<source>8</source>
-				<target>8</target>
-				<showDeprecation>true</showDeprecation>
-				<showWarnings>true</showWarnings>
-				<encoding>${project.build.sourceEncoding}</encoding>
-			</configuration>
-		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<release>16</release>
+					<source>8</source>
+					<target>8</target>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
 
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-jar-plugin</artifactId>
-			<version>3.2.2</version>
-			<configuration>
-				<archive>
-					<manifest>
-						<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-					</manifest>
-				</archive>
-			</configuration>
-		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
 
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-source-plugin</artifactId>
-			<version>3.2.0</version>
-			<executions>
-				<execution>
-					<id>attach-sources</id>
-					<goals>
-						<goal>jar-no-fork</goal>
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-javadoc-plugin</artifactId>
-			<version>3.3.2</version>
-			<executions>
-				<execution>
-					<id>attach-javadocs</id>
-					<goals>
-						<goal>jar</goal>
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.3.2</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-resources-plugin</artifactId>
-			<version>3.0.2</version>
-			<configuration>
-				<encoding>${project.build.sourceEncoding}</encoding>
-			</configuration>
-		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.2</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
 
 
-		<plugin>
-			<groupId>org.simplify4u.plugins</groupId>
-			<artifactId>sign-maven-plugin</artifactId>
-			<version>1.0.0</version>
-			<executions>
-				<execution>
-					<goals>
-						<goal>sign</goal>
-					</goals>
-					<configuration>
-						<!-- the same id as in settings.xml -->
-						<serverId>sign-key-id</serverId>
-					</configuration>
-				</execution>
-			</executions>
-		</plugin>
+			<plugin>
+				<groupId>org.simplify4u.plugins</groupId>
+				<artifactId>sign-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+						<configuration>
+							<!-- the same id as in settings.xml -->
+							<serverId>sign-key-id</serverId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-		<plugin>
-			<groupId>org.sonatype.plugins</groupId>
-			<artifactId>nexus-staging-maven-plugin</artifactId>
-			<version>1.6.13</version>
-			<extensions>true</extensions>
-			<configuration>
-				<serverId>ossrh</serverId>
-				<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-				<autoReleaseAfterClose>true</autoReleaseAfterClose>
-			</configuration>
-		</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.13</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
 
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-surefire-plugin</artifactId>
-			<version>2.22.2</version>
-			<configuration>
-				<forkMode>always</forkMode>
-				<argLine>-enableassertions</argLine>
-				<systemProperties>
-					<property>
-						<name>LocalStorage.dir</name>
-						<value>${project.build.testOutputDirectory}</value>
-					</property>
-				</systemProperties>
-			</configuration>
-		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+				<configuration>
+					<forkMode>always</forkMode>
+					<argLine>-enableassertions</argLine>
+					<systemProperties>
+						<property>
+							<name>LocalStorage.dir</name>
+							<value>${project.build.testOutputDirectory}</value>
+						</property>
+					</systemProperties>
+				</configuration>
+			</plugin>
 
-	  </plugins>
+		</plugins>
 	</build>
-  
-  <dependencies>
-  	<dependency>
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
-  		<version>4.13.1</version>
-  		<scope>test</scope>
-  	</dependency>
-  </dependencies>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
   
 </project>
