@@ -8,3 +8,7 @@ Trident animation library was developed by [Kirill Grouchnikov](https://www.push
 - See the [documentation](https://github.com/homebeaver/trident/wiki)
 
 The goal of this project is to rebuild the lib with mavan and publish it to OSSRH [maven repository](https://mvnrepository.com/artifact/io.github.homebeaver/trident).
+
+[Release 1.5.2](https://github.com/homebeaver/trident/releases/tag/v1.5.2) contains an animated Demo:
+
+![grafik](https://user-images.githubusercontent.com/3493126/181074090-fafe29b2-6cb8-4704-8671-e65b56c4fec3.png)
