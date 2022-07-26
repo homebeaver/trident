@@ -3,7 +3,7 @@
 
 	<groupId>io.github.homebeaver</groupId>
 	<artifactId>trident</artifactId>
-	<version>1.5.2-SNAPSHOT</version>
+	<version>1.5.2</version>
 
 	<url>https://github.com/homebeaver/trident</url>
 	<developers>
@@ -47,11 +47,10 @@
 					<include>**/*.*</include>
 				</includes>
 			</resource>
-			<!-- wg. loadSourceCode : -->
 			<resource>
 				<directory>${basedir}/src/main/java</directory>
 				<includes>
-					<include>**/*Demo.java</include>
+					<include>**/*.java</include>
 				</includes>
 			</resource>
 		</resources>
@@ -80,6 +79,7 @@
 					<archive>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<mainClass>org.pushingpixels.trident.demo.Fireworks</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

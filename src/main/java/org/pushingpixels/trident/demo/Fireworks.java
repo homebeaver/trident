@@ -27,7 +27,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package test.swing;
+package org.pushingpixels.trident.demo;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -101,12 +101,10 @@ public final class Fireworks extends JFrame {
 
         public void paint(Graphics g) {
             Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setComposite(AlphaComposite.SrcOver.derive(this.opacity));
             g2d.setColor(this.color);
-            g2d.fill(new Ellipse2D.Float(this.x - this.radius, this.y - this.radius, 2 * radius,
-                    2 * radius));
+            g2d.fill(new Ellipse2D.Float(this.x - this.radius, this.y - this.radius, 2 * radius, 2 * radius));
             g2d.dispose();
         }
     }
@@ -148,8 +146,7 @@ public final class Fireworks extends JFrame {
                     float finalX = (float) (this.x + finalDist * Math.cos(radians));
                     float finalY = (float) (this.y + finalDist * Math.sin(radians));
 
-                    SingleExplosion circle = new SingleExplosion(this.color, initX, initY,
-                            circleRadius);
+                    SingleExplosion circle = new SingleExplosion(this.color, initX, initY, circleRadius);
                     Timeline timeline = new Timeline(circle);
                     timeline.addPropertyToInterpolate("x", initX, finalX);
                     timeline.addPropertyToInterpolate("y", initY, finalY);
@@ -177,7 +174,7 @@ public final class Fireworks extends JFrame {
     }
 
     public Fireworks() {
-        super("Swing Fireworks");
+        super("Swing Fireworks animated by trident");
 
         this.mainPanel = new JPanel() {
             @Override
