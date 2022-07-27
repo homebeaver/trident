@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2021 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -53,7 +53,7 @@ import java.util.function.Supplier;
  * matching public setters. In that case, use the
  * {@link Timeline.BaseBuilder#addPropertyToInterpolate(String, Object, Object)} API to configure
  * which properties should be interpolated.
- *
+ * <p>
  * In a more complex case, use
  * {@link Timeline.BaseBuilder#addPropertyToInterpolate(TimelinePropertyBuilder)} together with
  * {@link Timeline#property(String)} and {@link TimelinePropertyBuilder#on(Object)} to interpolate
@@ -91,7 +91,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
 
     private String name;
 
-    private List<AbstractFieldInfo> propertiesToInterpolate;
+    private List<AbstractFieldInfo<?>> propertiesToInterpolate;
 
     /**
      * Is used to create unique value for the {@link #id} field.
@@ -152,7 +152,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         public void onTimelineStateChanged(TimelineState oldState, TimelineState newState,
                 float durationFraction, float timelinePosition) {
             if (newState == TimelineState.READY) {
-                for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
+                for (AbstractFieldInfo<?> fInfo : propertiesToInterpolate) {
                     // check whether the object is in the ready state
                     if (mainObjectIsUiComponent && !SwingUtils.isComponentInReadyState(fInfo.object)) {
                         continue;
@@ -162,7 +162,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             }
 
             if (newState == TimelineState.PLAYING_FORWARD) {
-                for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
+                for (AbstractFieldInfo<?> fInfo : propertiesToInterpolate) {
                     // check whether the object is in the ready state
                     if (mainObjectIsUiComponent && !SwingUtils.isComponentInReadyState(fInfo.object)) {
                         continue;
@@ -172,7 +172,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             }
 
             if (newState == TimelineState.PLAYING_REVERSE) {
-                for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
+                for (AbstractFieldInfo<?> fInfo : propertiesToInterpolate) {
                     // check whether the object is in the ready state
                     if (mainObjectIsUiComponent && !SwingUtils.isComponentInReadyState(fInfo.object)) {
                         continue;
@@ -186,7 +186,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             // it's a transition between inactive states (such as from
             // DONE to IDLE) that shouldn't trigger the property changes
             if (oldState.isActive || newState.isActive) {
-                for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
+                for (AbstractFieldInfo<?> fInfo : propertiesToInterpolate) {
                     // check whether the object is in the ready state
                     if (mainObjectIsUiComponent
                             && !SwingUtils.isComponentInReadyState(fInfo.object)) {
@@ -199,7 +199,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
 
         @Override
         public void onTimelinePulse(float durationFraction, float timelinePosition) {
-            for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
+            for (AbstractFieldInfo<?> fInfo : propertiesToInterpolate) {
                 // check whether the object is in the ready state
                 if (mainObjectIsUiComponent && !SwingUtils.isComponentInReadyState(fInfo.object)) {
                     continue;
@@ -428,7 +428,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             throw new IllegalArgumentException(
                     "Required skip longer than initial delay + duration");
         }
-        for (AbstractFieldInfo fieldInfo : this.propertiesToInterpolate) {
+        for (AbstractFieldInfo<?> fieldInfo : this.propertiesToInterpolate) {
             if (fieldInfo.isFromCurrent()) {
                 throw new IllegalArgumentException(
                         "Can't loop a timeline that has at least one property with .fromCurrent()");
@@ -555,7 +555,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         res.append(":" + this.timelinePosition);
 
         res.append(" [ ");
-        for (AbstractFieldInfo afi : this.propertiesToInterpolate) {
+        for (AbstractFieldInfo<?> afi : this.propertiesToInterpolate) {
             res.append(afi.fieldName + " ");
         }
         res.append("]");

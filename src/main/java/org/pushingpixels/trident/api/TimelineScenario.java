@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2021 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -59,8 +59,7 @@ public class TimelineScenario {
 
         public Chain(TimelineScenarioCallback... callbacks) {
             this.callbacks = new ArrayList<>();
-            for (TimelineScenarioCallback callback : callbacks)
-                this.callbacks.add(callback);
+            Collections.addAll(this.callbacks, callbacks);
         }
 
         public void addCallback(TimelineScenarioCallback callback) {
@@ -130,7 +129,7 @@ public class TimelineScenario {
     private void checkDoneActors() {
         synchronized (TimelineEngine.LOCK) {
             for (Iterator<TimelineScenarioActor> itRunning = this.runningActors
-                    .iterator(); itRunning.hasNext();) {
+                    .iterator(); itRunning.hasNext(); ) {
                 TimelineScenarioActor stillRunning = itRunning.next();
                 if (stillRunning.isDone()) {
                     itRunning.remove();
@@ -149,7 +148,7 @@ public class TimelineScenario {
 
             Set<TimelineScenarioActor> result = new HashSet<>();
             for (Iterator<TimelineScenarioActor> itWaiting = this.waitingActors
-                    .iterator(); itWaiting.hasNext();) {
+                    .iterator(); itWaiting.hasNext(); ) {
                 TimelineScenarioActor waitingActor = itWaiting.next();
                 boolean canRun = true;
                 Set<TimelineScenarioActor> toWaitFor = this.dependencies.get(waitingActor);
@@ -239,7 +238,7 @@ public class TimelineScenario {
         this.isLooping = false;
         this.state = TimelineScenarioState.PLAYING;
 
-        TimelineEngine.getInstance().runTimelineScenario(this,
+        TimelineEngine.getInstance().runTimelineScenario(
                 () -> TimelineEngine.getInstance().playScenario(TimelineScenario.this));
     }
 
@@ -251,7 +250,7 @@ public class TimelineScenario {
         }
         this.isLooping = true;
         this.state = TimelineScenarioState.PLAYING;
-        TimelineEngine.getInstance().runTimelineScenario(this,
+        TimelineEngine.getInstance().runTimelineScenario(
                 () -> TimelineEngine.getInstance().playScenario(TimelineScenario.this));
     }
 
