@@ -29,16 +29,9 @@
  */
 package org.pushingpixels.trident;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.pushingpixels.trident.callback.TimelineScenarioCallback;
+
+import java.util.*;
 
 public class TimelineScenario {
     private Set<TimelineScenarioActor> waitingActors;
@@ -128,8 +121,9 @@ public class TimelineScenario {
             this.checkDependencyParam(wait);
         }
 
-        if (!this.dependencies.containsKey(actor))
-            this.dependencies.put(actor, new HashSet<TimelineScenarioActor>());
+        if (!this.dependencies.containsKey(actor)) {
+            this.dependencies.put(actor, new HashSet<>());
+        }
         this.dependencies.get(actor).addAll(Arrays.asList(waitFor));
     }
 
@@ -178,8 +172,9 @@ public class TimelineScenario {
                 if (!this.isLooping) {
                     this.state = TimelineScenarioState.DONE;
                 } else {
-                    for (TimelineScenarioActor done : this.doneActors)
+                    for (TimelineScenarioActor done : this.doneActors) {
                         done.resetDoneFlag();
+                    }
                     this.waitingActors.addAll(this.doneActors);
                     this.doneActors.clear();
                 }

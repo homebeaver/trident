@@ -27,12 +27,45 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pushingpixels.trident.ease;
+package org.pushingpixels.trident.swing;
 
-public class Linear implements TimelineEase {
-    @Override
-    public float map(float durationFraction) {
-        return durationFraction;
+import org.pushingpixels.trident.Timeline;
+
+import java.awt.*;
+
+public class SwingComponentTimeline extends Timeline {
+    private boolean forceUiUpdate;
+
+    /**
+     * Constructs a new timeline associated with a Swing component.
+     *
+     * @param mainTimelineComp Main component for this timeline. Must not be <code>null</code>,
+     *                         otherwise an exception will be thrown.
+     */
+    public SwingComponentTimeline(Component mainTimelineComp) {
+        this(mainTimelineComp, false);
     }
 
+    /**
+     * Constructs a new timeline associated with a Swing component.
+     *
+     * @param mainTimelineComp Main component for this timeline. Must not be <code>null</code>,
+     *                         otherwise an exception will be thrown.
+     * @param forceUiUpdate    If this is <code>true</code>, updates to the timeline (pulse and
+     *                         state changes) will be forced to run even if the
+     *                         {@link SwingToolkitHandler}
+     *                         considers the associated component to not be in the ready state.
+     */
+    public SwingComponentTimeline(Component mainTimelineComp, boolean forceUiUpdate) {
+        super(mainTimelineComp);
+        if (mainTimelineComp == null) {
+            throw new IllegalArgumentException("Must have non-null component");
+        }
+        this.forceUiUpdate = forceUiUpdate;
+    }
+
+    @Override
+    protected boolean shouldForceUiUpdate() {
+        return this.forceUiUpdate;
+    }
 }

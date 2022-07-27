@@ -29,15 +29,15 @@
  */
 package org.pushingpixels.trident;
 
+import org.pushingpixels.trident.Timeline.TimelineState;
+import org.pushingpixels.trident.TimelineScenario.TimelineScenarioState;
+import org.pushingpixels.trident.callback.RunOnUIThread;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import org.pushingpixels.trident.Timeline.TimelineState;
-import org.pushingpixels.trident.TimelineScenario.TimelineScenarioState;
-import org.pushingpixels.trident.callback.RunOnUIThread;
 
 /**
  * The Trident timeline engine. This is the main entry point to play {@link Timeline}s and
@@ -47,7 +47,8 @@ import org.pushingpixels.trident.callback.RunOnUIThread;
  */
 class TimelineEngine {
     /**
-     * Debug mode indicator. Set to <code>true</code> to have trace messages on console.
+     * Debug mode indicator. Set to <code>true</code> to print trace messages to console
+     * during development.
      */
     public static boolean DEBUG_MODE = false;
 
@@ -95,6 +96,7 @@ class TimelineEngine {
          * ID to distinguish between different sub-components of {@link #mainObj}. For example, the
          * tabbed pane uses this field to make tab-specific animations.
          */
+        @SuppressWarnings("unchecked")
         public Comparable subID;
 
         /**
@@ -106,16 +108,12 @@ class TimelineEngine {
          *            ID to distinguish between different sub-components of <code>mainObj</code>.
          *            Can be <code>null</code>.
          */
+        @SuppressWarnings("unchecked")
         public FullObjectID(Object mainObj, Comparable subID) {
             this.mainObj = mainObj;
             this.subID = subID;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Object#hashCode()
-         */
         @Override
         public int hashCode() {
             int result = this.mainObj.hashCode();
@@ -124,11 +122,6 @@ class TimelineEngine {
             return result;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
         @Override
         @SuppressWarnings("unchecked")
         public boolean equals(Object obj) {
@@ -171,11 +164,6 @@ class TimelineEngine {
             this.setDaemon(true);
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Thread#run()
-         */
         @Override
         public final void run() {
             TridentConfig.PulseSource pulseSource = TridentConfig.getInstance().getPulseSource();
@@ -542,13 +530,8 @@ class TimelineEngine {
     /**
      * Returns an existing running timeline that matches the specified parameters.
      * 
-     * @param timelineKind
-     *            Timeline kind.
-     * @param object
-     *            Component.
-     * @param secondaryId
-     *            Secondary id. Relevant for such components as tabbed panes (where animation is
-     *            performed on different tabs).
+     * @param timeline
+     *            Timeline.
      * @return An existing running timeline that matches the specified parameters.
      */
     private Timeline getRunningTimeline(Timeline timeline) {

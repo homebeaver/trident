@@ -29,11 +29,10 @@
  */
 package org.pushingpixels.trident.swing;
 
-import java.awt.Component;
-
-import javax.swing.SwingUtilities;
-
 import org.pushingpixels.trident.UIToolkitHandler;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class SwingToolkitHandler implements UIToolkitHandler {
     @Override
@@ -48,9 +47,10 @@ public class SwingToolkitHandler implements UIToolkitHandler {
 
     @Override
     public void runOnUIThread(Object mainTimelineObject, Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread())
+        if (SwingUtilities.isEventDispatchThread()) {
             runnable.run();
-        else
+        } else {
             SwingUtilities.invokeLater(runnable);
+        }
     }
 }
