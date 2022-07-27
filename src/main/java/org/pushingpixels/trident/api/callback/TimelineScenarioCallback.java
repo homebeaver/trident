@@ -27,22 +27,18 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident.callback.api;
+package org.pushingpixels.trident.api.callback;
 
-import org.pushingpixels.trident.api.Timeline.TimelineState;
+import org.pushingpixels.trident.api.TimelineScenario;
 
 /**
- * Default implementation of {@link TimelineCallback} that does nothing.
+ * Callback for tracking the {@link TimelineScenario}s.
  * 
  * @author Kirill Grouchnikov
  */
-public class TimelineCallbackAdapter implements TimelineCallback {
-    @Override
-    public void onTimelineStateChanged(TimelineState oldState, TimelineState newState,
-            float durationFraction, float timelinePosition) {
-    }
-
-    @Override
-    public void onTimelinePulse(float durationFraction, float timelinePosition) {
-    }
+public interface TimelineScenarioCallback {
+    /**
+     * Indicates that the all timelines and actors in the timeline scenario have finished.
+     */
+    void onTimelineScenarioDone();
 }

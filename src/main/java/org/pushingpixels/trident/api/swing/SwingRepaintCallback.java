@@ -27,10 +27,10 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pushingpixels.trident.swing.api;
+package org.pushingpixels.trident.api.swing;
 
 import org.pushingpixels.trident.api.Timeline.TimelineState;
-import org.pushingpixels.trident.callback.api.TimelineCallbackAdapter;
+import org.pushingpixels.trident.api.callback.TimelineCallbackAdapter;
 
 import java.awt.*;
 import java.util.concurrent.atomic.AtomicBoolean;

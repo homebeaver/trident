@@ -27,7 +27,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident.callback.api;
+package org.pushingpixels.trident.api.callback;
 
 import org.pushingpixels.trident.api.Timeline;
 import org.pushingpixels.trident.api.Timeline.TimelineState;

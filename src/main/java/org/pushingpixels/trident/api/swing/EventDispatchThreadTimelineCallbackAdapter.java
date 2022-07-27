@@ -27,10 +27,10 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident.swing.api;
+package org.pushingpixels.trident.api.swing;
 
-import org.pushingpixels.trident.callback.api.TimelineCallback;
-import org.pushingpixels.trident.callback.api.TimelineCallbackAdapter;
+import org.pushingpixels.trident.api.callback.TimelineCallback;
+import org.pushingpixels.trident.api.callback.TimelineCallbackAdapter;
 
 /**
  * Empty implementation of {@link TimelineCallback} that does nothing but is

@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.pushingpixels.trident.interpolator.api;
+package org.pushingpixels.trident.api.interpolator;
 
 import java.util.ArrayList;
 import java.util.Collections;

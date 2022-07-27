@@ -31,11 +31,11 @@ package org.pushingpixels.trident.api;
 
 import org.pushingpixels.trident.api.TimelineEngine.*;
 import org.pushingpixels.trident.api.TimelinePropertyBuilder.AbstractFieldInfo;
-import org.pushingpixels.trident.callback.api.*;
-import org.pushingpixels.trident.ease.api.*;
+import org.pushingpixels.trident.api.callback.*;
+import org.pushingpixels.trident.api.ease.*;
+import org.pushingpixels.trident.api.interpolator.KeyFrames;
+import org.pushingpixels.trident.api.swing.RunOnEventDispatchThread;
 import org.pushingpixels.trident.internal.swing.SwingUtils;
-import org.pushingpixels.trident.interpolator.api.KeyFrames;
-import org.pushingpixels.trident.swing.api.RunOnEventDispatchThread;
 
 import java.util.*;
 import java.util.List;

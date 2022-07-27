@@ -27,26 +27,22 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident.swing.api;
+package org.pushingpixels.trident.api.callback;
 
-import javax.swing.*;
+import org.pushingpixels.trident.api.Timeline.TimelineState;
 
-import org.pushingpixels.trident.api.TimelineScenario;
-
-public abstract class TimelineSwingWorker<T, V> extends SwingWorker<T, V>
-        implements TimelineScenario.TimelineScenarioActor {
+/**
+ * Default implementation of {@link TimelineCallback} that does nothing.
+ * 
+ * @author Kirill Grouchnikov
+ */
+public class TimelineCallbackAdapter implements TimelineCallback {
     @Override
-    public void play() {
-        this.execute();
+    public void onTimelineStateChanged(TimelineState oldState, TimelineState newState,
+            float durationFraction, float timelinePosition) {
     }
 
     @Override
-    public boolean supportsReplay() {
-        return false;
-    }
-
-    @Override
-    public void resetDoneFlag() {
-        throw new UnsupportedOperationException();
+    public void onTimelinePulse(float durationFraction, float timelinePosition) {
     }
 }

@@ -33,8 +33,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.pushingpixels.trident.interpolator.api.PropertyInterpolator;
-import org.pushingpixels.trident.interpolator.api.PropertyInterpolatorSource;
+import org.pushingpixels.trident.api.interpolator.PropertyInterpolator;
+import org.pushingpixels.trident.api.interpolator.PropertyInterpolatorSource;
 
 public class CorePropertyInterpolators implements PropertyInterpolatorSource {
     private Set<PropertyInterpolator> interpolators;

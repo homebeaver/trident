@@ -27,7 +27,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident.swing.api;
+package org.pushingpixels.trident.api.swing;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

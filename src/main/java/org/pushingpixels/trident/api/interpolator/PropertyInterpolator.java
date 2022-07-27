@@ -27,10 +27,10 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident.interpolator.api;
+package org.pushingpixels.trident.api.interpolator;
 
-import java.util.Set;
+public interface PropertyInterpolator<T> {
+    Class getBasePropertyClass();
 
-public interface PropertyInterpolatorSource {
-    Set<PropertyInterpolator> getPropertyInterpolators();
+    T interpolate(T from, T to, float timelinePosition);
 }

@@ -55,8 +55,8 @@ import org.pushingpixels.trident.api.Timeline;
 import org.pushingpixels.trident.api.TimelineScenario;
 import org.pushingpixels.trident.api.Timeline.Builder;
 import org.pushingpixels.trident.api.Timeline.RepeatBehavior;
-import org.pushingpixels.trident.ease.api.Spline;
-import org.pushingpixels.trident.swing.api.SwingRepaintTimeline;
+import org.pushingpixels.trident.api.ease.Spline;
+import org.pushingpixels.trident.api.swing.SwingRepaintTimeline;
 
 public final class Fireworks extends JFrame {
     private Set<VolleyExplosion> volleys;

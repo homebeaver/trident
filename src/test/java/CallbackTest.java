@@ -1,10 +1,12 @@
+import java.util.logging.Logger;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.pushingpixels.trident.api.Timeline;
 import org.pushingpixels.trident.api.Timeline.Builder;
 import org.pushingpixels.trident.api.Timeline.TimelineState;
-import org.pushingpixels.trident.callback.api.TimelineCallbackAdapter;
+import org.pushingpixels.trident.api.callback.TimelineCallbackAdapter;
 
 /**
  * this test do not use Timeline.addPropertyToInterpolate() because there is no setter for a timeline property.
@@ -17,6 +19,7 @@ import org.pushingpixels.trident.callback.api.TimelineCallbackAdapter;
 @RunWith(JUnit4.class)
 public class CallbackTest extends junit.framework.TestCase {
 	
+	private static final Logger LOG = Logger.getLogger(CallbackTest.class.getName());
 	static final long DURATION = Timeline.DEFAULT_DURATION; //500;
 	static final int WAITFACTOR = 120; // % of DURATION
 
@@ -31,7 +34,7 @@ public class CallbackTest extends junit.framework.TestCase {
 	    @Override
 	    public void onTimelineStateChanged(TimelineState oldState, TimelineState newState,
 	            float durationFraction, float timelinePosition) {
-	        System.out.println("oldState "+ oldState + " -> " + newState + " , durationFraction="+durationFraction + " , timelinePosition="+timelinePosition);
+	        LOG.info("oldState "+ oldState + " -> " + newState + " , durationFraction="+durationFraction + " , timelinePosition="+timelinePosition);
 	        if(newState==TimelineState.READY) {
 		        this.pulseno = 0;
 	        }
@@ -65,7 +68,7 @@ public class CallbackTest extends junit.framework.TestCase {
 			long wait = DURATION*WAITFACTOR/100;
 			Thread.sleep(wait);
 			assertEquals(Timeline.TimelineState.IDLE, timeline.getState()); // ??? bei mvn install auch mal PLAYING_FORWARD
-			// TODO daher vll LOG, statt out.println damit Zeiten sichtbar werden
+			// TODO daher vll LOG, statt out.println damit Zeiten sichtbar werden, LOG per default nur sekundengenau
 //	        System.out.println(" timeline.getState() " + timeline.getState());
 			System.out.println(" waiting " + wait + "ms is long enough!");
 		} catch (InterruptedException e) {

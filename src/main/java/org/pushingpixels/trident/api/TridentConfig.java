@@ -30,10 +30,10 @@
 package org.pushingpixels.trident.api;
 
 import org.pushingpixels.trident.api.TimelineEngine.TridentAnimationThread;
+import org.pushingpixels.trident.api.interpolator.PropertyInterpolator;
+import org.pushingpixels.trident.api.interpolator.PropertyInterpolatorSource;
 import org.pushingpixels.trident.internal.interpolator.CorePropertyInterpolators;
 import org.pushingpixels.trident.internal.swing.AWTPropertyInterpolators;
-import org.pushingpixels.trident.interpolator.api.PropertyInterpolator;
-import org.pushingpixels.trident.interpolator.api.PropertyInterpolatorSource;
 
 import java.util.Collection;
 import java.util.Collections;

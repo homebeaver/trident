@@ -31,8 +31,8 @@ package org.pushingpixels.trident.api;
 
 import org.pushingpixels.trident.api.Timeline.TimelineState;
 import org.pushingpixels.trident.api.TimelineScenario.TimelineScenarioState;
+import org.pushingpixels.trident.api.swing.RunOnEventDispatchThread;
 import org.pushingpixels.trident.internal.swing.SwingUtils;
-import org.pushingpixels.trident.swing.api.RunOnEventDispatchThread;
 
 import java.util.HashSet;
 import java.util.Iterator;

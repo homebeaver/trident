@@ -31,7 +31,7 @@ package org.pushingpixels.trident.api;
 
 import java.util.*;
 
-import org.pushingpixels.trident.callback.api.TimelineScenarioCallback;
+import org.pushingpixels.trident.api.callback.TimelineScenarioCallback;
 
 public class TimelineScenario {
     private Set<TimelineScenarioActor> waitingActors;

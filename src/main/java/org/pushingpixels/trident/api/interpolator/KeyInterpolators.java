@@ -29,12 +29,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.pushingpixels.trident.interpolator.api;
+package org.pushingpixels.trident.api.interpolator;
 
 import java.util.ArrayList;
 
-import org.pushingpixels.trident.ease.api.Linear;
-import org.pushingpixels.trident.ease.api.TimelineEase;
+import org.pushingpixels.trident.api.ease.Linear;
+import org.pushingpixels.trident.api.ease.TimelineEase;
 
 /**
  *
