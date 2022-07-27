@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -11,7 +11,7 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- *  o Neither the name of Trident Kirill Grouchnikov nor the names of
+ *  o Neither the name of the copyright holder nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -64,7 +64,11 @@ public class Spline implements TimelineEase {
      * Creates a new instance of SplineInterpolator with the control points
      * defined by (x1, y1) and (x2, y2). The anchor points are implicitly
      * defined as (0, 0) and (1, 1).
-     * 
+     *
+     * @param x1 X coordinate of the first control point
+     * @param y1 Y coordinate of the first control point
+     * @param x2 X coordinate of the second control point
+     * @param y2 Y coordinate of the second control point
      * @throws IllegalArgumentException
      *             This exception is thrown when values beyond the allowed [0,1]
      *             range are passed in
@@ -127,7 +131,7 @@ public class Spline implements TimelineEase {
 
     /**
      * Utility function: When we are evaluating the spline, we only care about
-     * the Y values. See {@link getXY getXY} for the details.
+     * the Y values. See {@link #getXY(float)} for the details.
      */
     private float getY(float t) {
         float invT = (1 - t);

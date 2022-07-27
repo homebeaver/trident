@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -11,7 +11,7 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- *  o Neither the name of Trident Kirill Grouchnikov nor the names of
+ *  o Neither the name of the copyright holder nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -31,7 +31,8 @@ package org.pushingpixels.trident;
 
 import org.pushingpixels.trident.Timeline.TimelineState;
 import org.pushingpixels.trident.TimelineScenario.TimelineScenarioState;
-import org.pushingpixels.trident.callback.RunOnUIThread;
+import org.pushingpixels.trident.swing.RunOnEventDispatchThread;
+import org.pushingpixels.trident.internal.swing.SwingUtils;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,7 +42,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * The Trident timeline engine. This is the main entry point to play {@link Timeline}s and
- * {@link TimelineScenario}s. Use the {@link #getInstance()} method to get the timeline engine.
+ * {@link TimelineScenario}s. This class is for internal use only.
  * 
  * @author Kirill Grouchnikov
  */
@@ -291,7 +292,7 @@ class TimelineEngine {
                 boolean hasEnded = false;
                 if (DEBUG_MODE) {
                     System.out.println("Processing " + timeline.id + "["
-                            + timeline.mainObject.getClass().getSimpleName() + "] from "
+                            + timeline.getMainObject().getClass().getSimpleName() + "] from "
                             + timeline.durationFraction + ". Callback - "
                             + (timeline.callbackChain == null ? "no" : "yes"));
                 }
@@ -302,13 +303,13 @@ class TimelineEngine {
                 case PLAYING_FORWARD:
                     if (!timelineWasInReadyState) {
                         timeline.durationFraction = timeline.durationFraction
-                                + (float) passedSinceLastIteration / (float) timeline.duration;
+                                + (float) passedSinceLastIteration / (float) timeline.getDuration();
                     }
-                    timeline.timelinePosition = timeline.ease.map(timeline.durationFraction);
+                    timeline.timelinePosition = timeline.getEase().map(timeline.durationFraction);
                     if (DEBUG_MODE) {
                         System.out.println("Timeline " + timeline.id + " position: "
-                                + ((long) (timeline.durationFraction * timeline.duration)) + "/"
-                                + timeline.duration + " = " + timeline.durationFraction);
+                                + ((long) (timeline.durationFraction * timeline.getDuration()))
+                                + "/" + timeline.getDuration() + " = " + timeline.durationFraction);
                     }
                     if (timeline.durationFraction > 1.0f) {
                         timeline.durationFraction = 1.0f;
@@ -326,20 +327,21 @@ class TimelineEngine {
                                 hasEnded = true;
                                 itTimeline.remove();
                             } else {
-                                if (timeline.repeatBehavior == Timeline.RepeatBehavior.REVERSE) {
+                                if (timeline.getRepeatBehavior() ==
+                                        Timeline.RepeatBehavior.REVERSE) {
                                     timeline.replaceState(TimelineState.PLAYING_REVERSE);
-                                    if (timeline.cycleDelay > 0) {
+                                    if (timeline.getCycleDelay() > 0) {
                                         timeline.pushState(TimelineState.READY);
-                                        timeline.timeUntilPlay = timeline.cycleDelay;
+                                        timeline.timeUntilPlay = timeline.getCycleDelay();
                                     }
                                     this.callbackCallTimelineStateChanged(timeline,
                                             TimelineState.PLAYING_FORWARD);
                                 } else {
                                     timeline.durationFraction = 0.0f;
                                     timeline.timelinePosition = 0.0f;
-                                    if (timeline.cycleDelay > 0) {
+                                    if (timeline.getCycleDelay() > 0) {
                                         timeline.pushState(TimelineState.READY);
-                                        timeline.timeUntilPlay = timeline.cycleDelay;
+                                        timeline.timeUntilPlay = timeline.getCycleDelay();
                                         this.callbackCallTimelineStateChanged(timeline,
                                                 TimelineState.PLAYING_FORWARD);
                                     } else {
@@ -360,9 +362,9 @@ class TimelineEngine {
                 case PLAYING_REVERSE:
                     if (!timelineWasInReadyState) {
                         timeline.durationFraction = timeline.durationFraction
-                                - (float) passedSinceLastIteration / (float) timeline.duration;
+                                - (float) passedSinceLastIteration / (float) timeline.getDuration();
                     }
-                    timeline.timelinePosition = timeline.ease.map(timeline.durationFraction);
+                    timeline.timelinePosition = timeline.getEase().map(timeline.durationFraction);
                     // state.timelinePosition = state.timelinePosition
                     // - stepFactor
                     // * state.fadeStep.getNextStep(state.timelineKind,
@@ -370,8 +372,8 @@ class TimelineEngine {
                     // state.isPlayingForward, state.isLooping);
                     if (DEBUG_MODE) {
                         System.out.println("Timeline position: "
-                                + ((long) (timeline.durationFraction * timeline.duration)) + "/"
-                                + timeline.duration + " = " + timeline.durationFraction);
+                                + ((long) (timeline.durationFraction * timeline.getDuration()))
+                                + "/" + timeline.getDuration() + " = " + timeline.durationFraction);
                     }
                     if (timeline.durationFraction < 0) {
                         timeline.durationFraction = 0.0f;
@@ -390,9 +392,9 @@ class TimelineEngine {
                                 itTimeline.remove();
                             } else {
                                 timeline.replaceState(TimelineState.PLAYING_FORWARD);
-                                if (timeline.cycleDelay > 0) {
+                                if (timeline.getCycleDelay() > 0) {
                                     timeline.pushState(TimelineState.READY);
-                                    timeline.timeUntilPlay = timeline.cycleDelay;
+                                    timeline.timeUntilPlay = timeline.getCycleDelay();
                                 }
                                 this.callbackCallTimelineStateChanged(timeline,
                                         TimelineState.PLAYING_REVERSE);
@@ -472,16 +474,16 @@ class TimelineEngine {
             boolean shouldRunOnUIThread = false;
             Class<?> clazz = timeline.callbackChain.getClass();
             while ((clazz != null) && !shouldRunOnUIThread) {
-                shouldRunOnUIThread = clazz.isAnnotationPresent(RunOnUIThread.class);
+                shouldRunOnUIThread = clazz.isAnnotationPresent(RunOnEventDispatchThread.class);
                 clazz = clazz.getSuperclass();
             }
-            if (shouldRunOnUIThread && (timeline.uiToolkitHandler != null)) {
+            if (shouldRunOnUIThread && SwingUtils.isUiComponent(timeline.getMainObject())) {
                 if (DEBUG_MODE) {
                     System.out.println("Scheduling callback state change from " + oldState.name()
                             + " to " + newState.name() + " on timeline " + timeline.id);
                 }
                 // System.out.println("Will update from " + oldState + " to " + newState);
-                timeline.uiToolkitHandler.runOnUIThread(timeline.mainObject,
+                SwingUtils.runOnEventDispatchThread(
                         () -> timeline.callbackChain.onTimelineStateChanged(oldState, newState,
                                 durationFraction, timelinePosition));
             } else {
@@ -508,11 +510,11 @@ class TimelineEngine {
             boolean shouldRunOnUIThread = false;
             Class<?> clazz = timeline.callbackChain.getClass();
             while ((clazz != null) && !shouldRunOnUIThread) {
-                shouldRunOnUIThread = clazz.isAnnotationPresent(RunOnUIThread.class);
+                shouldRunOnUIThread = clazz.isAnnotationPresent(RunOnEventDispatchThread.class);
                 clazz = clazz.getSuperclass();
             }
-            if (shouldRunOnUIThread && (timeline.uiToolkitHandler != null)) {
-                timeline.uiToolkitHandler.runOnUIThread(timeline.mainObject,
+            if (shouldRunOnUIThread && SwingUtils.isUiComponent(timeline.getMainObject())) {
+                SwingUtils.runOnEventDispatchThread(
                         () -> timeline.callbackChain.onTimelinePulse(durationFraction,
                                 timelinePosition));
             } else {
@@ -550,7 +552,8 @@ class TimelineEngine {
      */
     private void addTimeline(Timeline timeline) {
         synchronized (LOCK) {
-            FullObjectID cid = new FullObjectID(timeline.mainObject, timeline.secondaryId);
+            FullObjectID cid = new FullObjectID(timeline.getMainObject(),
+                    timeline.getSecondaryId());
             timeline.fullObjectID = cid;
             this.runningTimelines.add(timeline);
             // this.nothingTracked = false;
@@ -572,11 +575,11 @@ class TimelineEngine {
             Timeline existing = this.getRunningTimeline(timeline);
             if (existing == null) {
                 TimelineState oldState = timeline.getState();
-                timeline.timeUntilPlay = timeline.initialDelay - msToSkip;
+                timeline.timeUntilPlay = timeline.getInitialDelay() - msToSkip;
                 if (timeline.timeUntilPlay < 0) {
                     timeline.durationFraction = (float) -timeline.timeUntilPlay
-                            / (float) timeline.duration;
-                    timeline.timelinePosition = timeline.ease.map(timeline.durationFraction);
+                            / (float) timeline.getDuration();
+                    timeline.timelinePosition = timeline.getEase().map(timeline.durationFraction);
                     timeline.timeUntilPlay = 0;
                 } else {
                     timeline.durationFraction = 0.0f;
@@ -636,11 +639,11 @@ class TimelineEngine {
             Timeline existing = this.getRunningTimeline(timeline);
             if (existing == null) {
                 TimelineState oldState = timeline.getState();
-                timeline.timeUntilPlay = timeline.initialDelay - msToSkip;
+                timeline.timeUntilPlay = timeline.getInitialDelay() - msToSkip;
                 if (timeline.timeUntilPlay < 0) {
                     timeline.durationFraction = 1.0f
-                            - (float) -timeline.timeUntilPlay / (float) timeline.duration;
-                    timeline.timelinePosition = timeline.ease.map(timeline.durationFraction);
+                            - (float) -timeline.timeUntilPlay / (float) timeline.getDuration();
+                    timeline.timelinePosition = timeline.getEase().map(timeline.durationFraction);
                     timeline.timeUntilPlay = 0;
                 } else {
                     timeline.durationFraction = 1.0f;
@@ -686,11 +689,11 @@ class TimelineEngine {
             Timeline existing = this.getRunningTimeline(timeline);
             if (existing == null) {
                 TimelineState oldState = timeline.getState();
-                timeline.timeUntilPlay = timeline.initialDelay - msToSkip;
+                timeline.timeUntilPlay = timeline.getInitialDelay() - msToSkip;
                 if (timeline.timeUntilPlay < 0) {
                     timeline.durationFraction = (float) -timeline.timeUntilPlay
-                            / (float) timeline.duration;
-                    timeline.timelinePosition = timeline.ease.map(timeline.durationFraction);
+                            / (float) timeline.getDuration();
+                    timeline.timelinePosition = timeline.getEase().map(timeline.durationFraction);
                     timeline.timeUntilPlay = 0;
                 } else {
                     timeline.durationFraction = 0.0f;

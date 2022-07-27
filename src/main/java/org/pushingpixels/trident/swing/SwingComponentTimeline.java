@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -11,7 +11,7 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- *  o Neither the name of Trident Kirill Grouchnikov nor the names of
+ *  o Neither the name of the copyright holder nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -36,14 +36,8 @@ import java.awt.*;
 public class SwingComponentTimeline extends Timeline {
     private boolean forceUiUpdate;
 
-    /**
-     * Constructs a new timeline associated with a Swing component.
-     *
-     * @param mainTimelineComp Main component for this timeline. Must not be <code>null</code>,
-     *                         otherwise an exception will be thrown.
-     */
-    public SwingComponentTimeline(Component mainTimelineComp) {
-        this(mainTimelineComp, false);
+    public static SwingComponentTimeline.Builder componentBuilder(Component component) {
+        return new SwingComponentTimeline.Builder(component);
     }
 
     /**
@@ -52,11 +46,10 @@ public class SwingComponentTimeline extends Timeline {
      * @param mainTimelineComp Main component for this timeline. Must not be <code>null</code>,
      *                         otherwise an exception will be thrown.
      * @param forceUiUpdate    If this is <code>true</code>, updates to the timeline (pulse and
-     *                         state changes) will be forced to run even if the
-     *                         {@link SwingToolkitHandler}
-     *                         considers the associated component to not be in the ready state.
+     *                         state changes) will be forced to run even if main component is not
+     *                         displayable.
      */
-    public SwingComponentTimeline(Component mainTimelineComp, boolean forceUiUpdate) {
+    private SwingComponentTimeline(Component mainTimelineComp, boolean forceUiUpdate) {
         super(mainTimelineComp);
         if (mainTimelineComp == null) {
             throw new IllegalArgumentException("Must have non-null component");
@@ -68,4 +61,29 @@ public class SwingComponentTimeline extends Timeline {
     protected boolean shouldForceUiUpdate() {
         return this.forceUiUpdate;
     }
+
+    public static class Builder extends BaseBuilder<SwingComponentTimeline,
+            SwingComponentTimeline.Builder, Component> {
+        private boolean forceUiUpdate;
+
+        public Builder(Component mainObject) {
+            super(mainObject);
+        }
+
+        public Builder setForceUiUpdate(boolean forceUiUpdate) {
+            this.forceUiUpdate = forceUiUpdate;
+            return this;
+        }
+
+        @Override
+        public SwingComponentTimeline build() {
+            SwingComponentTimeline timeline = new SwingComponentTimeline(this.mainObject, false);
+
+            this.configureBaseTimeline(timeline);
+            timeline.forceUiUpdate = this.forceUiUpdate;
+
+            return timeline;
+        }
+    }
+
 }

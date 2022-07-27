@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
@@ -11,7 +11,7 @@
  *    this list of conditions and the following disclaimer in the documentation 
  *    and/or other materials provided with the distribution. 
  *     
- *  o Neither the name of Trident Kirill Grouchnikov nor the names of 
+ *  o Neither the name of the copyright holder nor the names of
  *    its contributors may be used to endorse or promote products derived 
  *    from this software without specific prior written permission. 
  *     
@@ -50,12 +50,12 @@ public interface TimelineCallback {
      *            The current timeline duration fraction.Is guaranteed to be in
      *            0.0-1.0 range. The rate of change of this value is linear, and
      *            the value is proportional to
-     *            {@link Timeline#setDuration(long)}.
+     *            {@link Timeline.BaseBuilder#setDuration(long)}.
      * @param timelinePosition
      *            The current timeline position. Is guaranteed to be in 0.0-1.0
      *            range. The rate of change of this value is not necessarily
      *            linear and is affected by the
-     *            {@link Timeline#setEase(org.pushingpixels.trident.ease.TimelineEase)}
+     *            {@link Timeline.BaseBuilder#setEase(org.pushingpixels.trident.ease.TimelineEase)}
      *            .
      */
     void onTimelineStateChanged(TimelineState oldState, TimelineState newState,
@@ -68,12 +68,12 @@ public interface TimelineCallback {
      *            The current timeline duration fraction.Is guaranteed to be in
      *            0.0-1.0 range. The rate of change of this value is linear, and
      *            the value is proportional to
-     *            {@link Timeline#setDuration(long)}.
+     *            {@link Timeline.BaseBuilder#setDuration(long)}.
      * @param timelinePosition
      *            The current timeline position. Is guaranteed to be in 0.0-1.0
      *            range. The rate of change of this value is not necessarily
      *            linear and is affected by the
-     *            {@link Timeline#setEase(org.pushingpixels.trident.ease.TimelineEase)}
+     *            {@link Timeline.BaseBuilder#setEase(org.pushingpixels.trident.ease.TimelineEase)}
      *            .
      */
     void onTimelinePulse(float durationFraction, float timelinePosition);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -11,7 +11,7 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- *  o Neither the name of Trident Kirill Grouchnikov nor the names of
+ *  o Neither the name of the copyright holder nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -30,11 +30,10 @@
 package org.pushingpixels.trident;
 
 import org.pushingpixels.trident.TimelineEngine.TridentAnimationThread;
-import org.pushingpixels.trident.interpolator.CorePropertyInterpolators;
+import org.pushingpixels.trident.internal.interpolator.CorePropertyInterpolators;
 import org.pushingpixels.trident.interpolator.PropertyInterpolator;
 import org.pushingpixels.trident.interpolator.PropertyInterpolatorSource;
-import org.pushingpixels.trident.swing.AWTPropertyInterpolators;
-import org.pushingpixels.trident.swing.SwingToolkitHandler;
+import org.pushingpixels.trident.internal.swing.AWTPropertyInterpolators;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -43,8 +42,6 @@ import java.util.Set;
 
 public class TridentConfig {
     private static TridentConfig config;
-
-    private Set<UIToolkitHandler> uiToolkitHandlers;
 
     private Set<PropertyInterpolator> propertyInterpolators;
 
@@ -80,10 +77,8 @@ public class TridentConfig {
     private TridentConfig() {
         this.pulseSource = new DefaultPulseSource();
 
-        this.uiToolkitHandlers = new HashSet<UIToolkitHandler>();
-        this.propertyInterpolators = new HashSet<PropertyInterpolator>();
+        this.propertyInterpolators = new HashSet<>();
 
-        this.addUIToolkitHandler(new SwingToolkitHandler());
         this.addPropertyInterpolatorSource(new CorePropertyInterpolators());
         this.addPropertyInterpolatorSource(new AWTPropertyInterpolators());
     }
@@ -93,10 +88,6 @@ public class TridentConfig {
             config = new TridentConfig();
         }
         return config;
-    }
-
-    public synchronized Collection<UIToolkitHandler> getUIToolkitHandlers() {
-        return Collections.unmodifiableSet(this.uiToolkitHandlers);
     }
 
     public synchronized Collection<PropertyInterpolator> getPropertyInterpolators() {
@@ -134,14 +125,6 @@ public class TridentConfig {
 
     public synchronized void removePropertyInterpolator(PropertyInterpolator pInterpolator) {
         this.propertyInterpolators.remove(pInterpolator);
-    }
-
-    public synchronized void addUIToolkitHandler(UIToolkitHandler uiToolkitHandler) {
-        this.uiToolkitHandlers.add(uiToolkitHandler);
-    }
-
-    public synchronized void removeUIToolkitHandler(UIToolkitHandler uiToolkitHandler) {
-        this.uiToolkitHandlers.remove(uiToolkitHandler);
     }
 
     public synchronized void setPulseSource(PulseSource pulseSource) {

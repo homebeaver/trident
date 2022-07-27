@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -11,7 +11,7 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- *  o Neither the name of Trident Kirill Grouchnikov nor the names of
+ *  o Neither the name of the copyright holder nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -40,21 +40,21 @@ public class TimelinePropertyBuilder<T> {
     /**
      * Defines how to set a property.
      */
-    public static interface PropertySetter<T> {
-        public void set(Object obj, String fieldName, T value);
+    public interface PropertySetter<T> {
+        void set(Object obj, String fieldName, T value);
     }
 
     /**
      * Defines how to get a property.
      */
-    public static interface PropertyGetter<T> {
-        public T get(Object obj, String fieldName);
+    public interface PropertyGetter<T> {
+        T get(Object obj, String fieldName);
     }
 
     /**
      * Defines how to access a property.
      */
-    public static interface PropertyAccessor<T> extends PropertyGetter<T>, PropertySetter<T> {
+    public interface PropertyAccessor<T> extends PropertyGetter<T>, PropertySetter<T> {
     }
 
     /**
@@ -105,7 +105,7 @@ public class TimelinePropertyBuilder<T> {
     private PropertyInterpolator<T> interpolator; // optional
     private PropertyGetter<T> getter; // optional
     private PropertySetter<T> setter; // optional
-    private KeyFrames<T> keyFrames; // optional
+    private KeyFrames<? extends T> keyFrames; // optional
 
     TimelinePropertyBuilder(String propertyName) {
         this.propertyName = propertyName;
@@ -190,7 +190,7 @@ public class TimelinePropertyBuilder<T> {
         return this;
     }
 
-    public TimelinePropertyBuilder<T> goingThrough(KeyFrames<T> keyFrames) {
+    public TimelinePropertyBuilder<T> goingThrough(KeyFrames<? extends T> keyFrames) {
         if (this.keyFrames != null) {
             throw new IllegalArgumentException("goingThrough() can only be called once");
         }
@@ -208,9 +208,9 @@ public class TimelinePropertyBuilder<T> {
         return this;
     }
 
-    AbstractFieldInfo getFieldInfo(Timeline timeline) {
+    AbstractFieldInfo getFieldInfo(Object mainObject) {
         if (this.target == null) {
-            this.target = timeline.mainObject;
+            this.target = mainObject;
         }
 
         if (this.keyFrames != null) {
@@ -253,7 +253,6 @@ public class TimelinePropertyBuilder<T> {
         protected PropertySetter setter;
 
         protected F from;
-
         protected F to;
 
         AbstractFieldInfo(Object obj, String fieldName, PropertyGetter<F> pGetter,
@@ -271,6 +270,8 @@ public class TimelinePropertyBuilder<T> {
         }
 
         abstract void onStart();
+
+        abstract boolean isFromCurrent();
 
         abstract void updateFieldValue(float timelinePosition);
     }
@@ -311,6 +312,11 @@ public class TimelinePropertyBuilder<T> {
         }
 
         @Override
+        boolean isFromCurrent() {
+            return true;
+        }
+
+        @Override
         void updateFieldValue(float timelinePosition) {
             //System.out.println("updateFieldValue on @" + hashCode());
             try {
@@ -318,7 +324,8 @@ public class TimelinePropertyBuilder<T> {
                 this.setter.set(this.object, this.fieldName, value);
             } catch (Throwable exc) {
                 System.err.println("Exception occurred in updating field '" + this.fieldName
-                        + "' of object " + this.object.getClass().getCanonicalName()
+                        + "' of object " + ((this.object == null) ? "[NONE]"
+                        : this.object.getClass().getCanonicalName())
                         + " at timeline position " + timelinePosition);
                 exc.printStackTrace();
             }
@@ -340,13 +347,19 @@ public class TimelinePropertyBuilder<T> {
         }
 
         @Override
+        boolean isFromCurrent() {
+            return false;
+        }
+
+        @Override
         void updateFieldValue(float timelinePosition) {
             try {
                 Object value = this.propertyInterpolator.interpolate(from, to, timelinePosition);
                 this.setter.set(this.object, this.fieldName, value);
             } catch (Throwable exc) {
                 System.err.println("Exception occurred in updating field '" + this.fieldName
-                        + "' of object " + this.object.getClass().getCanonicalName()
+                        + "' of object " + ((this.object == null) ? "[NONE]"
+                            : this.object.getClass().getCanonicalName())
                         + " at timeline position " + timelinePosition);
                 exc.printStackTrace();
             }
@@ -364,6 +377,11 @@ public class TimelinePropertyBuilder<T> {
 
         @Override
         void onStart() {
+        }
+
+        @Override
+        boolean isFromCurrent() {
+            return false;
         }
 
         @Override

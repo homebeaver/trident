@@ -34,6 +34,7 @@ import org.pushingpixels.trident.UIToolkitHandler;
 import javax.swing.*;
 import java.awt.*;
 
+@Deprecated // in 2.0.0
 public class SwingToolkitHandler implements UIToolkitHandler {
     @Override
     public boolean isHandlerFor(Object mainTimelineObject) {

@@ -29,6 +29,7 @@
  */
 package org.pushingpixels.trident;
 
+@Deprecated // in 2.0.0
 public interface UIToolkitHandler {
     boolean isHandlerFor(Object mainTimelineObject);
 

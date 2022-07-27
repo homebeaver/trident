@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -11,7 +11,7 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- *  o Neither the name of Trident Kirill Grouchnikov nor the names of
+ *  o Neither the name of the copyright holder nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -29,56 +29,74 @@
  */
 package org.pushingpixels.trident;
 
-import org.pushingpixels.trident.TimelineEngine.FullObjectID;
-import org.pushingpixels.trident.TimelineEngine.TimelineOperationKind;
+import org.pushingpixels.trident.TimelineEngine.*;
 import org.pushingpixels.trident.TimelinePropertyBuilder.AbstractFieldInfo;
-import org.pushingpixels.trident.callback.RunOnUIThread;
-import org.pushingpixels.trident.callback.TimelineCallback;
-import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
-import org.pushingpixels.trident.ease.Linear;
-import org.pushingpixels.trident.ease.TimelineEase;
+import org.pushingpixels.trident.callback.*;
+import org.pushingpixels.trident.ease.*;
 import org.pushingpixels.trident.interpolator.KeyFrames;
+import org.pushingpixels.trident.swing.RunOnEventDispatchThread;
+import org.pushingpixels.trident.internal.swing.SwingUtils;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Stack;
 
+/**
+ * The main entry point into Trident. Use {@link #builder()} or {@link #builder(Object)}
+ * and methods on the {@link Timeline.BaseBuilder} to configure one or more properties to
+ * be interpolated over a period of time. In the simplest case, a timeline operates on
+ * a single object passed to {@link #builder(Object)}, and one or more properties that have
+ * matching public setters. In that case, use the
+ * {@link Timeline.BaseBuilder#addPropertyToInterpolate(String, Object, Object)} API to configure
+ * which properties should be interpolated.
+ *
+ * In a more complex case, use
+ * {@link Timeline.BaseBuilder#addPropertyToInterpolate(TimelinePropertyBuilder)} together with
+ * {@link Timeline#property(String)} and {@link TimelinePropertyBuilder#on(Object)} to interpolate
+ * properties of multiple objects.
+ * {@link TimelinePropertyBuilder#setWith(TimelinePropertyBuilder.PropertySetter)},
+ * {@link TimelinePropertyBuilder#getWith(TimelinePropertyBuilder.PropertyGetter)} and
+ * {@link TimelinePropertyBuilder#accessWith(TimelinePropertyBuilder.PropertyAccessor)}
+ * can be used to work with properties that are not exposed via public setters or getters.
+ */
 public class Timeline implements TimelineScenario.TimelineScenarioActor {
-    Object mainObject;
+    public static final long DEFAULT_DURATION = 500;
+    public static final TimelineEase DEFAULT_EASE = new Linear();
 
-    Comparable<?> secondaryId;
+    private Object mainObject;
+
+    private Comparable<?> secondaryId;
 
     FullObjectID fullObjectID;
 
-    long duration;
+    private long duration;
 
-    long initialDelay;
+    private long initialDelay;
 
-    long cycleDelay;
+    private long cycleDelay;
 
     boolean isLooping;
 
     int repeatCount;
 
-    RepeatBehavior repeatBehavior;
+    private RepeatBehavior repeatBehavior;
 
-    UIToolkitHandler uiToolkitHandler;
+    private boolean mainObjectIsUiComponent;
 
     Chain callbackChain;
 
-    String name;
+    private String name;
 
-    List<AbstractFieldInfo> propertiesToInterpolate;
+    private List<AbstractFieldInfo> propertiesToInterpolate;
 
     /**
      * Is used to create unique value for the {@link #id} field.
      */
-    static long counter;
+    private static long counter;
 
     /**
      * Unique ID.
      */
-    protected long id;
+    long id;
 
     /**
      * Timeline position.
@@ -98,9 +116,9 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
      */
     boolean toCancelAtCycleBreak;
 
-    Stack<TimelineState> stateStack;
+    private Stack<TimelineState> stateStack;
 
-    TimelineEase ease;
+    private TimelineEase ease;
 
     private int doneCount;
 
@@ -109,8 +127,13 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
     }
 
     public enum TimelineState {
-        IDLE(false), READY(false), PLAYING_FORWARD(true), PLAYING_REVERSE(true), SUSPENDED(
-                false), CANCELLED(false), DONE(false);
+        IDLE(false),
+        READY(false),
+        PLAYING_FORWARD(true),
+        PLAYING_REVERSE(true),
+        SUSPENDED(false),
+        CANCELLED(false),
+        DONE(false);
 
         private boolean isActive;
 
@@ -126,8 +149,8 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             if (newState == TimelineState.READY) {
                 for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
                     // check whether the object is in the ready state
-                    if ((uiToolkitHandler != null)
-                            && !uiToolkitHandler.isInReadyState(fInfo.object)) {
+                    if (mainObjectIsUiComponent
+                            && !SwingUtils.isComponentInReadyState(fInfo.object)) {
                         continue;
                     }
                     fInfo.onStart();
@@ -141,9 +164,10 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             if (oldState.isActive || newState.isActive) {
                 for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
                     // check whether the object is in the ready state
-                    if ((uiToolkitHandler != null)
-                            && !uiToolkitHandler.isInReadyState(fInfo.object))
+                    if (mainObjectIsUiComponent
+                            && !SwingUtils.isComponentInReadyState(fInfo.object)) {
                         continue;
+                    }
                     fInfo.updateFieldValue(timelinePosition);
                 }
             }
@@ -153,8 +177,9 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         public void onTimelinePulse(float durationFraction, float timelinePosition) {
             for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
                 // check whether the object is in the ready state
-                if ((uiToolkitHandler != null) && !uiToolkitHandler.isInReadyState(fInfo.object))
+                if (mainObjectIsUiComponent && !SwingUtils.isComponentInReadyState(fInfo.object)) {
                     continue;
+                }
                 // System.err.println("Timeline @" + Timeline.this.hashCode()
                 // + " at position " + timelinePosition);
                 fInfo.updateFieldValue(timelinePosition);
@@ -162,7 +187,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         }
     }
 
-    @RunOnUIThread
+    @RunOnEventDispatchThread
     private class UISetter extends Setter {
     }
 
@@ -191,11 +216,11 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             boolean shouldRunOnUIThread = false;
             Class<?> clazz = callback.getClass();
             while ((clazz != null) && !shouldRunOnUIThread) {
-                shouldRunOnUIThread = clazz.isAnnotationPresent(RunOnUIThread.class);
+                shouldRunOnUIThread = clazz.isAnnotationPresent(RunOnEventDispatchThread.class);
                 clazz = clazz.getSuperclass();
             }
-            if (shouldRunOnUIThread && (Timeline.this.uiToolkitHandler != null)) {
-                Timeline.this.uiToolkitHandler.runOnUIThread(mainObject,
+            if (shouldRunOnUIThread && Timeline.this.mainObjectIsUiComponent) {
+                SwingUtils.runOnEventDispatchThread(
                         () -> callback.onTimelineStateChanged(oldState, newState, durationFraction,
                                 timelinePosition));
             } else {
@@ -208,8 +233,8 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         public void onTimelineStateChanged(final TimelineState oldState,
                 final TimelineState newState, final float durationFraction,
                 final float timelinePosition) {
-            if ((uiToolkitHandler != null) && !shouldForceUiUpdate() &&
-                    !uiToolkitHandler.isInReadyState(mainObject)) {
+            if (mainObjectIsUiComponent && !shouldForceUiUpdate() &&
+                    !SwingUtils.isComponentInReadyState(mainObject)) {
                 if (TimelineEngine.DEBUG_MODE) {
                     System.out.println("Main object [" + mainObject.getClass().getSimpleName()
                             + "@" + mainObject.hashCode()
@@ -234,13 +259,14 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             boolean shouldRunOnUIThread = false;
             Class<?> clazz = callback.getClass();
             while ((clazz != null) && !shouldRunOnUIThread) {
-                shouldRunOnUIThread = clazz.isAnnotationPresent(RunOnUIThread.class);
+                shouldRunOnUIThread = clazz.isAnnotationPresent(RunOnEventDispatchThread.class);
                 clazz = clazz.getSuperclass();
             }
-            if (shouldRunOnUIThread && (Timeline.this.uiToolkitHandler != null)) {
-                Timeline.this.uiToolkitHandler.runOnUIThread(mainObject, () -> {
-                    if (Timeline.this.getState() == TimelineState.CANCELLED)
+            if (shouldRunOnUIThread && Timeline.this.mainObjectIsUiComponent) {
+                SwingUtils.runOnEventDispatchThread(() -> {
+                    if (Timeline.this.getState() == TimelineState.CANCELLED) {
                         return;
+                    }
                     // System.err.println("Timeline @"
                     // + Timeline.this.hashCode());
                     callback.onTimelinePulse(durationFraction, timelinePosition);
@@ -254,10 +280,11 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
 
         @Override
         public void onTimelinePulse(final float durationFraction, final float timelinePosition) {
-            if ((uiToolkitHandler != null) && !shouldForceUiUpdate() &&
-                    !uiToolkitHandler.isInReadyState(mainObject)) {
+            if (mainObjectIsUiComponent && !shouldForceUiUpdate() &&
+                    !SwingUtils.isComponentInReadyState(mainObject)) {
                 if (TimelineEngine.DEBUG_MODE) {
-                    System.out.println("Main object is not in ready state for pulse " + durationFraction);
+                    System.out.println(
+                            "Main object is not in ready state for pulse " + durationFraction);
                 }
                 return;
             }
@@ -269,72 +296,37 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         }
     }
 
-    public Timeline() {
-        this(null);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public Timeline(Object mainTimelineObject) {
-        this.mainObject = mainTimelineObject;
+    public static Builder builder(Object mainTimelineObject) {
+        return new Builder(mainTimelineObject);
+    }
 
-        for (UIToolkitHandler uiToolkitHandler : TridentConfig.getInstance()
-                .getUIToolkitHandlers()) {
-            if (uiToolkitHandler.isHandlerFor(mainTimelineObject)) {
-                this.uiToolkitHandler = uiToolkitHandler;
-                break;
-            }
-        }
+    protected Timeline(Object mainTimelineObject) {
+        this.mainObject = mainTimelineObject;
+        this.mainObjectIsUiComponent = SwingUtils.isUiComponent(this.mainObject);
 
         // if the main timeline object is handled by a UI toolkit handler,
         // the setters registered with the different addProperty
         // APIs need to run with the matching threading policy
-        Setter setterCallback = (this.uiToolkitHandler != null) ? new UISetter() : new Setter();
+        Setter setterCallback = this.mainObjectIsUiComponent ? new UISetter() : new Setter();
         this.callbackChain = new Chain(setterCallback);
 
-        this.duration = 500;
-        this.propertiesToInterpolate = new ArrayList<AbstractFieldInfo>();
+        this.duration = DEFAULT_DURATION;
+        this.propertiesToInterpolate = new ArrayList<>();
         this.id = Timeline.getId();
         // this.loopsToLive = -1;
 
-        this.stateStack = new Stack<TimelineState>();
+        this.stateStack = new Stack<>();
         this.stateStack.push(TimelineState.IDLE);
         this.doneCount = 0;
 
-        this.ease = new Linear();
+        this.ease = DEFAULT_EASE;
     }
 
-    public final void setSecondaryID(Comparable<?> secondaryId) {
-        if (this.getState() != TimelineState.IDLE) {
-            throw new IllegalArgumentException(
-                    "Cannot change state of non-idle timeline [" + this.toString() + "]");
-        }
-        this.secondaryId = secondaryId;
-    }
-
-    public final void setDuration(long durationMs) {
-        if (this.getState() != TimelineState.IDLE) {
-            throw new IllegalArgumentException(
-                    "Cannot change state of non-idle timeline [" + this.toString() + "]");
-        }
-        this.duration = durationMs;
-    }
-
-    public final void setInitialDelay(long initialDelay) {
-        if (this.getState() != TimelineState.IDLE) {
-            throw new IllegalArgumentException(
-                    "Cannot change state of non-idle timeline [" + this.toString() + "]");
-        }
-        this.initialDelay = initialDelay;
-    }
-
-    public final void setCycleDelay(long cycleDelay) {
-        if (this.getState() != TimelineState.IDLE) {
-            throw new IllegalArgumentException(
-                    "Cannot change state of non-idle timeline [" + this.toString() + "]");
-        }
-        this.cycleDelay = cycleDelay;
-    }
-
-    public final void addCallback(TimelineCallback callback) {
+    protected final void addCallback(TimelineCallback callback) {
         if (this.getState() != TimelineState.IDLE) {
             throw new IllegalArgumentException(
                     "Cannot change state of non-idle timeline [" + this.toString() + "]");
@@ -342,28 +334,8 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         this.callbackChain.addCallback(callback);
     }
 
-    public final void removeCallback(TimelineCallback callback) {
-        if (this.getState() != TimelineState.IDLE) {
-            throw new IllegalArgumentException(
-                    "Cannot change state of non-idle timeline [" + this.toString() + "]");
-        }
-        this.callbackChain.removeCallback(callback);
-    }
-
     public static <T> TimelinePropertyBuilder<T> property(String propertyName) {
-        return new TimelinePropertyBuilder<T>(propertyName);
-    }
-
-    public final <T> void addPropertyToInterpolate(TimelinePropertyBuilder<T> propertyBuilder) {
-        this.propertiesToInterpolate.add(propertyBuilder.getFieldInfo(this));
-    }
-
-    public final <T> void addPropertyToInterpolate(String propName, KeyFrames<T> keyFrames) {
-        this.addPropertyToInterpolate(Timeline.<T>property(propName).goingThrough(keyFrames));
-    }
-
-    public final <T> void addPropertyToInterpolate(String propName, T from, T to) {
-        this.addPropertyToInterpolate(Timeline.<T>property(propName).from(from).to(to));
+        return new TimelinePropertyBuilder<>(propertyName);
     }
 
     protected boolean shouldForceUiUpdate() {
@@ -432,6 +404,12 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             throw new IllegalArgumentException(
                     "Required skip longer than initial delay + duration");
         }
+        for (AbstractFieldInfo fieldInfo : this.propertiesToInterpolate) {
+            if (fieldInfo.isFromCurrent()) {
+                throw new IllegalArgumentException(
+                        "Can't loop a timeline that has at least one property with .fromCurrent()");
+            }
+        }
         TimelineEngine.getInstance().runTimelineOperation(this, TimelineOperationKind.PLAY, () -> {
             Timeline.this.isLooping = true;
             Timeline.this.repeatCount = loopCount;
@@ -446,7 +424,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
      * interpolations are done on the {@link TimelineState#CANCELLED} state, the timeline
      * transitions to the {@link TimelineState#IDLE} state. Application callbacks and field
      * interpolations are done on this state as well.
-     * 
+     *
      * @see #end()
      * @see #abort()
      */
@@ -460,7 +438,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
      * application callbacks and field interpolations are done on the {@link TimelineState#DONE}
      * state, the timeline transitions to the {@link TimelineState#IDLE} state. Application
      * callbacks and field interpolations are done on this state as well.
-     * 
+     *
      * @see #cancel()
      * @see #abort()
      */
@@ -471,7 +449,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
     /**
      * Aborts this timeline. The timeline transitions to the {@link TimelineState#IDLE} state. No
      * application callbacks or field interpolations are done.
-     * 
+     *
      * @see #cancel()
      * @see #end()
      */
@@ -493,14 +471,15 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
      * be called only on looping timelines.
      */
     public void cancelAtCycleBreak() {
-        if (!this.isLooping)
+        if (!this.isLooping) {
             throw new IllegalArgumentException("Can only be called on looping timelines");
+        }
         this.toCancelAtCycleBreak = true;
     }
 
     /**
      * Returns a unique ID.
-     * 
+     *
      * @return Unique ID.
      */
     protected static synchronized long getId() {
@@ -517,13 +496,6 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
 
     public final TimelineState getState() {
         return this.stateStack.peek();
-    }
-
-    public final void setEase(TimelineEase ease) {
-        if (this.getState() != TimelineState.IDLE) {
-            throw new IllegalArgumentException("Cannot change state of non-idle timeline");
-        }
-        this.ease = ease;
     }
 
     @Override
@@ -573,8 +545,9 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
     }
 
     void pushState(TimelineState state) {
-        if (state == TimelineState.DONE)
+        if (state == TimelineState.DONE) {
             this.doneCount++;
+        }
         this.stateStack.add(state);
     }
 
@@ -586,15 +559,212 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         return this.duration;
     }
 
-    public String getName() {
-        return name;
+    public long getInitialDelay() {
+        return this.initialDelay;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public long getCycleDelay() {
+        return this.cycleDelay;
+    }
+
+    public RepeatBehavior getRepeatBehavior() {
+        return this.repeatBehavior;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public TimelineEase getEase() {
+        return this.ease;
     }
 
     public Object getMainObject() {
         return this.mainObject;
+    }
+
+    public Comparable<?> getSecondaryId() {
+        return this.secondaryId;
+    }
+
+    public abstract static class BaseBuilder<T extends Timeline, B extends BaseBuilder,
+            M extends Object> {
+        protected M mainObject;
+        protected Comparable<?> secondaryId;
+        protected long duration = Timeline.DEFAULT_DURATION;
+        protected long initialDelay;
+        protected long cycleDelay;
+        protected int repeatCount;
+        protected RepeatBehavior repeatBehavior;
+        protected List<TimelineCallback> callbacks = new ArrayList<>();
+        protected String name;
+        protected List<AbstractFieldInfo> propertiesToInterpolate = new ArrayList<>();
+        protected TimelineEase ease = Timeline.DEFAULT_EASE;
+
+        public BaseBuilder() {
+            this(null);
+        }
+
+        public BaseBuilder(M mainObject) {
+            this.mainObject = mainObject;
+        }
+
+        protected void configureBaseTimeline(Timeline timeline) {
+            timeline.secondaryId = this.secondaryId;
+            timeline.duration = this.duration;
+            timeline.initialDelay = this.initialDelay;
+            timeline.cycleDelay = this.cycleDelay;
+            timeline.repeatCount = this.repeatCount;
+            timeline.repeatBehavior = this.repeatBehavior;
+            timeline.name = this.name;
+            timeline.ease = this.ease;
+
+            for (TimelineCallback callback : this.callbacks) {
+                timeline.callbackChain.addCallback(callback);
+            }
+
+            timeline.propertiesToInterpolate.addAll(this.propertiesToInterpolate);
+        }
+
+        public B setSecondaryId(Comparable<?> secondaryId) {
+            this.secondaryId = secondaryId;
+            return (B) this;
+        }
+
+        public B setDuration(long duration) {
+            this.duration = duration;
+            return (B) this;
+        }
+
+        public long getDuration() {
+            return this.duration;
+        }
+
+        public B setInitialDelay(long initialDelay) {
+            this.initialDelay = initialDelay;
+            return (B) this;
+        }
+
+        public B setCycleDelay(long cycleDelay) {
+            this.cycleDelay = cycleDelay;
+            return (B) this;
+        }
+
+        public B setRepeatCount(int repeatCount) {
+            this.repeatCount = repeatCount;
+            return (B) this;
+        }
+
+        public B setRepeatBehavior(RepeatBehavior repeatBehavior) {
+            this.repeatBehavior = repeatBehavior;
+            return (B) this;
+        }
+
+        public B setName(String name) {
+            this.name = name;
+            return (B) this;
+        }
+
+        public B setEase(TimelineEase ease) {
+            this.ease = ease;
+            return (B) this;
+        }
+
+        public <P> B addPropertyToInterpolate(TimelinePropertyBuilder<P> propertyBuilder) {
+            this.propertiesToInterpolate.add(propertyBuilder.getFieldInfo(this.mainObject));
+            return (B) this;
+        }
+
+        public <P> B addPropertyToInterpolate(String propName, KeyFrames<P> keyFrames) {
+            return this.addPropertyToInterpolate(
+                    Timeline.<P>property(propName).goingThrough(keyFrames));
+        }
+
+        public <P> B addPropertyToInterpolate(String propName, P from, P to) {
+            return this.addPropertyToInterpolate(Timeline.<P>property(propName).from(from).to(to));
+        }
+
+        public B addCallback(TimelineCallback callback) {
+            this.callbacks.add(callback);
+            return (B) this;
+        }
+
+        public abstract T build();
+
+        /**
+         * A shortcut for {@link #build()} chained with {@link Timeline#play()}
+         */
+        public void play() {
+            build().play();
+        }
+
+        /**
+         * A shortcut for {@link #build()} chained with {@link Timeline#playSkipping(long)}
+         */
+        public void playSkipping(final long msToSkip) {
+            build().playSkipping(msToSkip);
+        }
+
+        /**
+         * A shortcut for {@link #build()} chained with {@link Timeline#playReverse()}
+         */
+        public void playReverse() {
+            build().playReverse();
+        }
+
+        /**
+         * A shortcut for {@link #build()} chained with {@link Timeline#playReverseSkipping(long)}
+         */
+        public void playReverseSkipping(final long msToSkip) {
+            build().playReverseSkipping(msToSkip);
+        }
+
+        /**
+         * A shortcut for {@link #build()} chained with {@link Timeline#playLoop(RepeatBehavior)}
+         */
+        public void playLoop(RepeatBehavior repeatBehavior) {
+            build().playLoop(repeatBehavior);
+        }
+
+        /**
+         * A shortcut for {@link #build()} chained with
+         * {@link Timeline#playLoopSkipping(RepeatBehavior, long)}
+         */
+        public void playLoopSkipping(RepeatBehavior repeatBehavior, final long msToSkip) {
+            build().playLoopSkipping(repeatBehavior, msToSkip);
+        }
+
+        /**
+         * A shortcut for {@link #build()} chained with
+         * {@link Timeline#playLoop(int, RepeatBehavior)}
+         */
+        public void playLoop(int loopCount, RepeatBehavior repeatBehavior) {
+            build().playLoop(loopCount, repeatBehavior);
+        }
+
+        /**
+         * A shortcut for {@link #build()} chained with
+         * {@link Timeline#playLoopSkipping(int, RepeatBehavior, long)}
+         */
+        public void playLoopSkipping(final int loopCount, final RepeatBehavior repeatBehavior,
+                final long msToSkip) {
+            build().playLoopSkipping(loopCount, repeatBehavior, msToSkip);
+        }
+    }
+
+    public static class Builder extends BaseBuilder<Timeline, Builder, Object> {
+        public Builder() {
+        }
+
+        public Builder(Object mainObject) {
+            super(mainObject);
+        }
+
+        @Override
+        public Timeline build() {
+            Timeline timeline = new Timeline(this.mainObject);
+            this.configureBaseTimeline(timeline);
+            return timeline;
+        }
     }
 }

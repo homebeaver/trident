@@ -41,5 +41,6 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated // in 2.0.0
 public @interface RunOnUIThread {
 }

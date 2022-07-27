@@ -52,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.pushingpixels.trident.Timeline;
+import org.pushingpixels.trident.Timeline.Builder;
 import org.pushingpixels.trident.Timeline.RepeatBehavior;
 import org.pushingpixels.trident.TimelineScenario;
 import org.pushingpixels.trident.ease.Spline;
@@ -147,12 +148,13 @@ public final class Fireworks extends JFrame {
                     float finalY = (float) (this.y + finalDist * Math.sin(radians));
 
                     SingleExplosion circle = new SingleExplosion(this.color, initX, initY, circleRadius);
-                    Timeline timeline = new Timeline(circle);
-                    timeline.addPropertyToInterpolate("x", initX, finalX);
-                    timeline.addPropertyToInterpolate("y", initY, finalY);
-                    timeline.addPropertyToInterpolate("opacity", 1.0f, 0.0f);
-                    timeline.setDuration(duration - 200 + randomizer.nextInt(400));
-                    timeline.setEase(new Spline(0.4f));
+                    Builder b = Timeline.builder(circle);
+                    b.addPropertyToInterpolate("x", initX, finalX);
+                    b.addPropertyToInterpolate("y", initY, finalY);
+                    b.addPropertyToInterpolate("opacity", 1.0f, 0.0f);
+                    b.setDuration(duration - 200 + randomizer.nextInt(400));
+                    b.setEase(new Spline(0.4f));
+                    Timeline timeline = b.build();
 
                     synchronized (this.circles) {
                         circles.add(circle);
@@ -189,7 +191,9 @@ public final class Fireworks extends JFrame {
         this.mainPanel.setBackground(Color.black);
         this.mainPanel.setPreferredSize(new Dimension(480, 320));
 
-        Timeline repaint = new SwingRepaintTimeline(this);
+        SwingRepaintTimeline.Builder b = SwingRepaintTimeline.repaintBuilder(this);
+        Timeline repaint = b.build();
+        
         repaint.playLoop(RepeatBehavior.LOOP);
 
         this.volleys = new HashSet<VolleyExplosion>();
