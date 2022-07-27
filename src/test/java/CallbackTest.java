@@ -1,10 +1,10 @@
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.Timeline.Builder;
-import org.pushingpixels.trident.Timeline.TimelineState;
-import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
+import org.pushingpixels.trident.api.Timeline;
+import org.pushingpixels.trident.api.Timeline.Builder;
+import org.pushingpixels.trident.api.Timeline.TimelineState;
+import org.pushingpixels.trident.callback.api.TimelineCallbackAdapter;
 
 /**
  * this test do not use Timeline.addPropertyToInterpolate() because there is no setter for a timeline property.

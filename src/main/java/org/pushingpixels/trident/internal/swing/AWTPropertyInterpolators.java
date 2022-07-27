@@ -29,13 +29,13 @@
  */
 package org.pushingpixels.trident.internal.swing;
 
-import org.pushingpixels.trident.interpolator.PropertyInterpolator;
-import org.pushingpixels.trident.interpolator.PropertyInterpolatorSource;
-
 import java.awt.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.pushingpixels.trident.interpolator.api.PropertyInterpolator;
+import org.pushingpixels.trident.interpolator.api.PropertyInterpolatorSource;
 
 /**
  * Built-in interpolators for Swing / AWT / Java2D classes.

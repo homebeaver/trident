@@ -29,12 +29,12 @@
  */
 package org.pushingpixels.trident.internal.interpolator;
 
-import org.pushingpixels.trident.interpolator.PropertyInterpolator;
-import org.pushingpixels.trident.interpolator.PropertyInterpolatorSource;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.pushingpixels.trident.interpolator.api.PropertyInterpolator;
+import org.pushingpixels.trident.interpolator.api.PropertyInterpolatorSource;
 
 public class CorePropertyInterpolators implements PropertyInterpolatorSource {
     private Set<PropertyInterpolator> interpolators;

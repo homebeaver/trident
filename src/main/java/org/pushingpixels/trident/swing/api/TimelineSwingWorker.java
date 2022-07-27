@@ -27,11 +27,11 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident.swing;
-
-import org.pushingpixels.trident.TimelineScenario;
+package org.pushingpixels.trident.swing.api;
 
 import javax.swing.*;
+
+import org.pushingpixels.trident.api.TimelineScenario;
 
 public abstract class TimelineSwingWorker<T, V> extends SwingWorker<T, V>
         implements TimelineScenario.TimelineScenarioActor {

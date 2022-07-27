@@ -27,11 +27,11 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident;
-
-import org.pushingpixels.trident.TimelineScenario.TimelineScenarioActor;
+package org.pushingpixels.trident.api;
 
 import java.util.concurrent.*;
+
+import org.pushingpixels.trident.api.TimelineScenario.TimelineScenarioActor;
 
 public abstract class TimelineRunnable implements Runnable, TimelineScenarioActor {
     private static ExecutorService service = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 10L,

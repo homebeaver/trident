@@ -27,13 +27,13 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pushingpixels.trident;
-
-import org.pushingpixels.trident.interpolator.KeyFrames;
-import org.pushingpixels.trident.interpolator.PropertyInterpolator;
+package org.pushingpixels.trident.api;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+
+import org.pushingpixels.trident.interpolator.api.KeyFrames;
+import org.pushingpixels.trident.interpolator.api.PropertyInterpolator;
 
 public class TimelinePropertyBuilder<T> {
 

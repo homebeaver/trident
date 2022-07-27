@@ -27,12 +27,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pushingpixels.trident;
+package org.pushingpixels.trident.api;
 
-import org.pushingpixels.trident.Timeline.TimelineState;
-import org.pushingpixels.trident.TimelineScenario.TimelineScenarioState;
-import org.pushingpixels.trident.swing.RunOnEventDispatchThread;
+import org.pushingpixels.trident.api.Timeline.TimelineState;
+import org.pushingpixels.trident.api.TimelineScenario.TimelineScenarioState;
 import org.pushingpixels.trident.internal.swing.SwingUtils;
+import org.pushingpixels.trident.swing.api.RunOnEventDispatchThread;
 
 import java.util.HashSet;
 import java.util.Iterator;

@@ -27,13 +27,13 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pushingpixels.trident;
+package org.pushingpixels.trident.api;
 
-import org.pushingpixels.trident.TimelineEngine.TridentAnimationThread;
+import org.pushingpixels.trident.api.TimelineEngine.TridentAnimationThread;
 import org.pushingpixels.trident.internal.interpolator.CorePropertyInterpolators;
-import org.pushingpixels.trident.interpolator.PropertyInterpolator;
-import org.pushingpixels.trident.interpolator.PropertyInterpolatorSource;
 import org.pushingpixels.trident.internal.swing.AWTPropertyInterpolators;
+import org.pushingpixels.trident.interpolator.api.PropertyInterpolator;
+import org.pushingpixels.trident.interpolator.api.PropertyInterpolatorSource;
 
 import java.util.Collection;
 import java.util.Collections;

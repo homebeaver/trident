@@ -29,14 +29,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.pushingpixels.trident.interpolator;
-
-import org.pushingpixels.trident.TimelinePropertyBuilder.PropertySetter;
-import org.pushingpixels.trident.TridentConfig;
+package org.pushingpixels.trident.interpolator.api;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.pushingpixels.trident.api.TridentConfig;
+import org.pushingpixels.trident.api.TimelinePropertyBuilder.PropertySetter;
 
 /**
  * Stores a list of values that correspond to the times in a {@link KeyTimes}

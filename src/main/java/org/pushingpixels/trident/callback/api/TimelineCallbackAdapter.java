@@ -27,9 +27,9 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-package org.pushingpixels.trident.callback;
+package org.pushingpixels.trident.callback.api;
 
-import org.pushingpixels.trident.Timeline.TimelineState;
+import org.pushingpixels.trident.api.Timeline.TimelineState;
 
 /**
  * Default implementation of {@link TimelineCallback} that does nothing.

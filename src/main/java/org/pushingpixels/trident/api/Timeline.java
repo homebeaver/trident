@@ -27,15 +27,15 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pushingpixels.trident;
+package org.pushingpixels.trident.api;
 
-import org.pushingpixels.trident.TimelineEngine.*;
-import org.pushingpixels.trident.TimelinePropertyBuilder.AbstractFieldInfo;
-import org.pushingpixels.trident.callback.*;
-import org.pushingpixels.trident.ease.*;
-import org.pushingpixels.trident.interpolator.KeyFrames;
-import org.pushingpixels.trident.swing.RunOnEventDispatchThread;
+import org.pushingpixels.trident.api.TimelineEngine.*;
+import org.pushingpixels.trident.api.TimelinePropertyBuilder.AbstractFieldInfo;
+import org.pushingpixels.trident.callback.api.*;
+import org.pushingpixels.trident.ease.api.*;
 import org.pushingpixels.trident.internal.swing.SwingUtils;
+import org.pushingpixels.trident.interpolator.api.KeyFrames;
+import org.pushingpixels.trident.swing.api.RunOnEventDispatchThread;
 
 import java.util.*;
 import java.util.List;

@@ -5,8 +5,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.Timeline.Builder;
+import org.pushingpixels.trident.api.Timeline;
+import org.pushingpixels.trident.api.Timeline.Builder;
 
 @RunWith(JUnit4.class)
 public class HelloWorldTest extends junit.framework.TestCase {

@@ -27,11 +27,11 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pushingpixels.trident.swing;
-
-import org.pushingpixels.trident.Timeline;
+package org.pushingpixels.trident.swing.api;
 
 import java.awt.*;
+
+import org.pushingpixels.trident.api.Timeline;
 
 public class SwingComponentTimeline extends Timeline {
     private boolean forceUiUpdate;
