@@ -64,7 +64,8 @@ public class CallbackTest extends junit.framework.TestCase {
 	        // long enough? 120 % of default Duration or more 
 			long wait = DURATION*WAITFACTOR/100;
 			Thread.sleep(wait);
-			assertEquals(Timeline.TimelineState.IDLE, timeline.getState());
+			assertEquals(Timeline.TimelineState.IDLE, timeline.getState()); // ??? bei mvn install auch mal PLAYING_FORWARD
+			// TODO daher vll LOG, statt out.println damit Zeiten sichtbar werden
 //	        System.out.println(" timeline.getState() " + timeline.getState());
 			System.out.println(" waiting " + wait + "ms is long enough!");
 		} catch (InterruptedException e) {
