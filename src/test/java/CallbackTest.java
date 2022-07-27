@@ -53,10 +53,10 @@ public class CallbackTest extends junit.framework.TestCase {
 	public void testDefaultDuration() {
 		TestHelloWorld helloWorld = new TestHelloWorld();
         Builder tlb = Timeline.builder();
-//        tlb.addPropertyToInterpolate("value", 0.0f, 1.0f);  // not used!
+//        tlb.addPropertyToInterpolate("value", 0.0f, 1.0f);  // not used! addCallback instead:
+		tlb.addCallback(helloWorld);
         Timeline timeline = tlb.build();
 		assertEquals(DURATION, timeline.getDuration());
-		tlb.addCallback(helloWorld);
 		
 		timeline.play();
 		try {
@@ -73,6 +73,7 @@ public class CallbackTest extends junit.framework.TestCase {
 		
 		// 2nd test - we wait not long enough
 		// last is still 1.0
+		System.out.println(" helloWorld.getLast() " + helloWorld.getLast() + " helloWorld.pulseno="+helloWorld.pulseno);
 		assertTrue(1f==helloWorld.getLast());
 		assertTrue(helloWorld.pulseno>0);
 		

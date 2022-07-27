@@ -52,7 +52,7 @@ public class HelloWorldTest extends junit.framework.TestCase {
 	@Test
 	public void testDefaultDuration() {
 		TestHelloWorld helloWorld = new TestHelloWorld();
-        Builder tlb = Timeline.builder();
+        Builder tlb = Timeline.builder(helloWorld);
         tlb.addPropertyToInterpolate("value", 0.0f, 1.0f);
         Timeline timeline = tlb.build();
 		assertEquals(DURATION, timeline.getDuration());
