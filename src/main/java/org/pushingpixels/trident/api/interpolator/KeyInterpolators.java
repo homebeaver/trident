@@ -31,10 +31,10 @@
 
 package org.pushingpixels.trident.api.interpolator;
 
-import java.util.ArrayList;
-
 import org.pushingpixels.trident.api.ease.Linear;
 import org.pushingpixels.trident.api.ease.TimelineEase;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -42,7 +42,7 @@ import org.pushingpixels.trident.api.ease.TimelineEase;
  */
 class KeyInterpolators {
 
-    private ArrayList<TimelineEase> interpolators = new ArrayList<TimelineEase>();
+    private ArrayList<TimelineEase> interpolators = new ArrayList<>();
 
     /**
      * Creates a new instance of KeyInterpolators

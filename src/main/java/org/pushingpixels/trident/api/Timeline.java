@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,16 +29,21 @@
  */
 package org.pushingpixels.trident.api;
 
-import org.pushingpixels.trident.api.TimelineEngine.*;
+import org.pushingpixels.trident.api.TimelineEngine.FullObjectID;
+import org.pushingpixels.trident.api.TimelineEngine.TimelineOperationKind;
 import org.pushingpixels.trident.api.TimelinePropertyBuilder.AbstractFieldInfo;
-import org.pushingpixels.trident.api.callback.*;
-import org.pushingpixels.trident.api.ease.*;
+import org.pushingpixels.trident.api.callback.TimelineCallback;
+import org.pushingpixels.trident.api.callback.TimelineCallbackAdapter;
+import org.pushingpixels.trident.api.ease.Linear;
+import org.pushingpixels.trident.api.ease.TimelineEase;
 import org.pushingpixels.trident.api.interpolator.KeyFrames;
 import org.pushingpixels.trident.api.swing.RunOnEventDispatchThread;
 import org.pushingpixels.trident.internal.swing.SwingUtils;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
+import java.util.function.Supplier;
 
 /**
  * The main entry point into Trident. Use {@link #builder()} or {@link #builder(Object)}
@@ -137,7 +142,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
 
         private boolean isActive;
 
-        private TimelineState(boolean isActive) {
+        TimelineState(boolean isActive) {
             this.isActive = isActive;
         }
     }
@@ -149,11 +154,30 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             if (newState == TimelineState.READY) {
                 for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
                     // check whether the object is in the ready state
-                    if (mainObjectIsUiComponent
-                            && !SwingUtils.isComponentInReadyState(fInfo.object)) {
+                    if (mainObjectIsUiComponent && !SwingUtils.isComponentInReadyState(fInfo.object)) {
                         continue;
                     }
                     fInfo.onStart();
+                }
+            }
+
+            if (newState == TimelineState.PLAYING_FORWARD) {
+                for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
+                    // check whether the object is in the ready state
+                    if (mainObjectIsUiComponent && !SwingUtils.isComponentInReadyState(fInfo.object)) {
+                        continue;
+                    }
+                    fInfo.updateTo();
+                }
+            }
+
+            if (newState == TimelineState.PLAYING_REVERSE) {
+                for (AbstractFieldInfo fInfo : propertiesToInterpolate) {
+                    // check whether the object is in the ready state
+                    if (mainObjectIsUiComponent && !SwingUtils.isComponentInReadyState(fInfo.object)) {
+                        continue;
+                    }
+                    fInfo.updateFrom();
                 }
             }
 
@@ -197,7 +221,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
 
         public Chain(Setter setterCallback) {
             this.setterCallback = setterCallback;
-            this.callbacks = new ArrayList<TimelineCallback>();
+            this.callbacks = new ArrayList<>();
         }
 
         public void addCallback(TimelineCallback callback) {
@@ -587,8 +611,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         return this.secondaryId;
     }
 
-    public abstract static class BaseBuilder<T extends Timeline, B extends BaseBuilder,
-            M extends Object> {
+    public abstract static class BaseBuilder<T extends Timeline, B extends BaseBuilder<?, ?, ?>, M> {
         protected M mainObject;
         protected Comparable<?> secondaryId;
         protected long duration = Timeline.DEFAULT_DURATION;
@@ -598,7 +621,7 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
         protected RepeatBehavior repeatBehavior;
         protected List<TimelineCallback> callbacks = new ArrayList<>();
         protected String name;
-        protected List<AbstractFieldInfo> propertiesToInterpolate = new ArrayList<>();
+        protected List<AbstractFieldInfo<?>> propertiesToInterpolate = new ArrayList<>();
         protected TimelineEase ease = Timeline.DEFAULT_EASE;
 
         public BaseBuilder() {
@@ -626,11 +649,13 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             timeline.propertiesToInterpolate.addAll(this.propertiesToInterpolate);
         }
 
+        @SuppressWarnings("unchecked")
         public B setSecondaryId(Comparable<?> secondaryId) {
             this.secondaryId = secondaryId;
             return (B) this;
         }
 
+        @SuppressWarnings("unchecked")
         public B setDuration(long duration) {
             this.duration = duration;
             return (B) this;
@@ -640,36 +665,43 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             return this.duration;
         }
 
+        @SuppressWarnings("unchecked")
         public B setInitialDelay(long initialDelay) {
             this.initialDelay = initialDelay;
             return (B) this;
         }
 
+        @SuppressWarnings("unchecked")
         public B setCycleDelay(long cycleDelay) {
             this.cycleDelay = cycleDelay;
             return (B) this;
         }
 
+        @SuppressWarnings("unchecked")
         public B setRepeatCount(int repeatCount) {
             this.repeatCount = repeatCount;
             return (B) this;
         }
 
+        @SuppressWarnings("unchecked")
         public B setRepeatBehavior(RepeatBehavior repeatBehavior) {
             this.repeatBehavior = repeatBehavior;
             return (B) this;
         }
 
+        @SuppressWarnings("unchecked")
         public B setName(String name) {
             this.name = name;
             return (B) this;
         }
 
+        @SuppressWarnings("unchecked")
         public B setEase(TimelineEase ease) {
             this.ease = ease;
             return (B) this;
         }
 
+        @SuppressWarnings("unchecked")
         public <P> B addPropertyToInterpolate(TimelinePropertyBuilder<P> propertyBuilder) {
             this.propertiesToInterpolate.add(propertyBuilder.getFieldInfo(this.mainObject));
             return (B) this;
@@ -684,6 +716,12 @@ public class Timeline implements TimelineScenario.TimelineScenarioActor {
             return this.addPropertyToInterpolate(Timeline.<P>property(propName).from(from).to(to));
         }
 
+        public <P> B addPropertyToInterpolate(String propName, Supplier<P> fromSupplier, Supplier<P> toSupplier) {
+            return this.addPropertyToInterpolate(Timeline.<P>property(propName).fromSupplier(fromSupplier).
+                    toSupplier(toSupplier));
+        }
+
+        @SuppressWarnings("unchecked")
         public B addCallback(TimelineCallback callback) {
             this.callbacks.add(callback);
             return (B) this;

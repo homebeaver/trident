@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,9 +30,9 @@
 package org.pushingpixels.trident.api;
 
 import org.pushingpixels.trident.api.TimelineEngine.TridentAnimationThread;
+import org.pushingpixels.trident.internal.interpolator.CorePropertyInterpolators;
 import org.pushingpixels.trident.api.interpolator.PropertyInterpolator;
 import org.pushingpixels.trident.api.interpolator.PropertyInterpolatorSource;
-import org.pushingpixels.trident.internal.interpolator.CorePropertyInterpolators;
 import org.pushingpixels.trident.internal.swing.AWTPropertyInterpolators;
 
 import java.util.Collection;
@@ -43,12 +43,12 @@ import java.util.Set;
 public class TridentConfig {
     private static TridentConfig config;
 
-    private Set<PropertyInterpolator> propertyInterpolators;
+    private Set<PropertyInterpolator<?>> propertyInterpolators;
 
     private TridentConfig.PulseSource pulseSource;
 
     public interface PulseSource {
-        public void waitUntilNextPulse();
+        void waitUntilNextPulse();
     }
 
     public static class FixedRatePulseSource implements TridentConfig.PulseSource {
@@ -68,7 +68,7 @@ public class TridentConfig {
         }
     }
 
-    private class DefaultPulseSource extends FixedRatePulseSource {
+    private static class DefaultPulseSource extends FixedRatePulseSource {
         DefaultPulseSource() {
             super(40);
         }
@@ -90,31 +90,31 @@ public class TridentConfig {
         return config;
     }
 
-    public synchronized Collection<PropertyInterpolator> getPropertyInterpolators() {
+    public synchronized Collection<PropertyInterpolator<?>> getPropertyInterpolators() {
         return Collections.unmodifiableSet(this.propertyInterpolators);
     }
 
-    public synchronized PropertyInterpolator getPropertyInterpolator(Object... values) {
-        for (PropertyInterpolator interpolator : this.propertyInterpolators) {
+    @SuppressWarnings("unchecked")
+    public synchronized <T> PropertyInterpolator<T> getPropertyInterpolator(Collection<T> values) {
+        for (PropertyInterpolator<?> interpolator : this.propertyInterpolators) {
             try {
-                Class basePropertyClass = interpolator.getBasePropertyClass();
+                Class<?> basePropertyClass = interpolator.getBasePropertyClass();
                 boolean hasMatch = true;
                 for (Object value : values) {
                     if (!basePropertyClass.isAssignableFrom(value.getClass())) {
                         hasMatch = false;
-                        continue;
                     }
                 }
-                if (hasMatch)
-                    return interpolator;
+                if (hasMatch) {
+                    return (PropertyInterpolator<T>) interpolator;
+                }
             } catch (NoClassDefFoundError ncdfe) {
-                continue;
             }
         }
         return null;
     }
 
-    public synchronized void addPropertyInterpolator(PropertyInterpolator pInterpolator) {
+    public synchronized void addPropertyInterpolator(PropertyInterpolator<?> pInterpolator) {
         this.propertyInterpolators.add(pInterpolator);
     }
 
@@ -123,7 +123,7 @@ public class TridentConfig {
         this.propertyInterpolators.addAll(pInterpolatorSource.getPropertyInterpolators());
     }
 
-    public synchronized void removePropertyInterpolator(PropertyInterpolator pInterpolator) {
+    public synchronized void removePropertyInterpolator(PropertyInterpolator<?> pInterpolator) {
         this.propertyInterpolators.remove(pInterpolator);
     }
 

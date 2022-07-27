@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,9 +29,9 @@
  */
 package org.pushingpixels.trident.api.swing;
 
-import java.awt.*;
-
 import org.pushingpixels.trident.api.Timeline;
+
+import java.awt.*;
 
 public class SwingComponentTimeline extends Timeline {
     private boolean forceUiUpdate;

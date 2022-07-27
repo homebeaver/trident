@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@
 package org.pushingpixels.trident.api.interpolator;
 
 public interface PropertyInterpolator<T> {
-    Class getBasePropertyClass();
+    Class<T> getBasePropertyClass();
 
     T interpolate(T from, T to, float timelinePosition);
 }

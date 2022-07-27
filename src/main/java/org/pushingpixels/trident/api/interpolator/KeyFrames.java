@@ -31,6 +31,7 @@
 
 package org.pushingpixels.trident.api.interpolator;
 
+import org.pushingpixels.trident.api.ease.Linear;
 import org.pushingpixels.trident.api.ease.TimelineEase;
 
 /**
@@ -95,7 +96,7 @@ public class KeyFrames<T> {
      * @param interpolators
      *            collection of Interpolators that control the calculation of
      *            values in each of the intervals defined by keyFrames. If this
-     *            value is null, a {@link org.pushingpixels.trident.api.ease.Linear} will be used for
+     *            value is null, a {@link Linear} will be used for
      *            all intervals. If there is only one interpolator, that
      *            interpolator will be used for all intervals. Otherwise, there
      *            must be a number of interpolators equal to the number of
@@ -123,7 +124,7 @@ public class KeyFrames<T> {
      * @param interpolators
      *            collection of Interpolators that control the calculation of
      *            values in each of the intervals defined by keyFrames. If this
-     *            value is null, a {@link org.pushingpixels.trident.api.ease.Linear} will be used for
+     *            value is null, a {@link Linear} will be used for
      *            all intervals. If there is only one interpolator, that
      *            interpolator will be used for all intervals. Otherwise, there
      *            must be a number of interpolators equal to the number of
@@ -145,7 +146,7 @@ public class KeyFrames<T> {
         int numFrames = keyValues.getSize();
         // If keyTimes null, create our own
         if (keyTimes == null) {
-            float keyTimesArray[] = new float[numFrames];
+            float[] keyTimesArray = new float[numFrames];
             float timeVal = 0.0f;
             keyTimesArray[0] = timeVal;
             for (int i = 1; i < (numFrames - 1); ++i) {
@@ -208,7 +209,7 @@ public class KeyFrames<T> {
      * @param fraction Fraction
      * @return Value for the given fraction elapsed of the animation cycle.
      */
-    public Object getValue(float fraction) {
+    public T getValue(float fraction) {
         // First, figure out the real fraction to use, given the
         // interpolation type and keyTimes
         int interval = getInterval(fraction);

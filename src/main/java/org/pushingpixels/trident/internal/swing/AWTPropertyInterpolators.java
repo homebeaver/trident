@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
@@ -29,13 +29,13 @@
  */
 package org.pushingpixels.trident.internal.swing;
 
+import org.pushingpixels.trident.api.interpolator.PropertyInterpolator;
+import org.pushingpixels.trident.api.interpolator.PropertyInterpolatorSource;
+
 import java.awt.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.pushingpixels.trident.api.interpolator.PropertyInterpolator;
-import org.pushingpixels.trident.api.interpolator.PropertyInterpolatorSource;
 
 /**
  * Built-in interpolators for Swing / AWT / Java2D classes.
@@ -43,7 +43,7 @@ import org.pushingpixels.trident.api.interpolator.PropertyInterpolatorSource;
  * @author Kirill Grouchnikov
  */
 public class AWTPropertyInterpolators implements PropertyInterpolatorSource {
-    private Set<PropertyInterpolator> interpolators;
+    private Set<PropertyInterpolator<?>> interpolators;
 
     public AWTPropertyInterpolators() {
         this.interpolators = new HashSet<>();
@@ -54,13 +54,13 @@ public class AWTPropertyInterpolators implements PropertyInterpolatorSource {
     }
 
     @Override
-    public Set<PropertyInterpolator> getPropertyInterpolators() {
+    public Set<PropertyInterpolator<?>> getPropertyInterpolators() {
         return Collections.unmodifiableSet(this.interpolators);
     }
 
     static class ColorInterpolator implements PropertyInterpolator<Color> {
         @Override
-        public Class getBasePropertyClass() {
+        public Class<Color> getBasePropertyClass() {
             return Color.class;
         }
 
@@ -158,7 +158,7 @@ public class AWTPropertyInterpolators implements PropertyInterpolatorSource {
         }
 
         @Override
-        public Class getBasePropertyClass() {
+        public Class<Point> getBasePropertyClass() {
             return Point.class;
         }
     }
@@ -173,7 +173,7 @@ public class AWTPropertyInterpolators implements PropertyInterpolatorSource {
         }
 
         @Override
-        public Class getBasePropertyClass() {
+        public Class<Rectangle> getBasePropertyClass() {
             return Rectangle.class;
         }
     }
@@ -185,7 +185,7 @@ public class AWTPropertyInterpolators implements PropertyInterpolatorSource {
             return new Dimension(w, h);
         }
 
-        public Class getBasePropertyClass() {
+        public Class<Dimension> getBasePropertyClass() {
             return Dimension.class;
         }
     }

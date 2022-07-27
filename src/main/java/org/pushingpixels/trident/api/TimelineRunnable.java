@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
@@ -29,13 +29,13 @@
  */
 package org.pushingpixels.trident.api;
 
-import java.util.concurrent.*;
-
 import org.pushingpixels.trident.api.TimelineScenario.TimelineScenarioActor;
+
+import java.util.concurrent.*;
 
 public abstract class TimelineRunnable implements Runnable, TimelineScenarioActor {
     private static ExecutorService service = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 10L,
-            TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+            TimeUnit.SECONDS, new SynchronousQueue<>());
 
     private Future<?> future;
 

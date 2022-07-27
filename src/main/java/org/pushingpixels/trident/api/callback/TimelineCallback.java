@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@ package org.pushingpixels.trident.api.callback;
 
 import org.pushingpixels.trident.api.Timeline;
 import org.pushingpixels.trident.api.Timeline.TimelineState;
+import org.pushingpixels.trident.api.ease.TimelineEase;
 
 /**
  * Callback for the fade tracker. Is used when the application (some UI
@@ -55,7 +56,7 @@ public interface TimelineCallback {
      *            The current timeline position. Is guaranteed to be in 0.0-1.0
      *            range. The rate of change of this value is not necessarily
      *            linear and is affected by the
-     *            {@link Timeline.BaseBuilder#setEase(org.pushingpixels.trident.ease.TimelineEase)}
+     *            {@link Timeline.BaseBuilder#setEase(TimelineEase)}
      *            .
      */
     void onTimelineStateChanged(TimelineState oldState, TimelineState newState,
@@ -73,7 +74,7 @@ public interface TimelineCallback {
      *            The current timeline position. Is guaranteed to be in 0.0-1.0
      *            range. The rate of change of this value is not necessarily
      *            linear and is affected by the
-     *            {@link Timeline.BaseBuilder#setEase(org.pushingpixels.trident.ease.TimelineEase)}
+     *            {@link Timeline.BaseBuilder#setEase(TimelineEase)}
      *            .
      */
     void onTimelinePulse(float durationFraction, float timelinePosition);

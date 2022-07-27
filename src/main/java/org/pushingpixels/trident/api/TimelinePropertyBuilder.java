@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,11 +29,15 @@
  */
 package org.pushingpixels.trident.api;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
 import org.pushingpixels.trident.api.interpolator.KeyFrames;
 import org.pushingpixels.trident.api.interpolator.PropertyInterpolator;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.function.Supplier;
 
 public class TimelinePropertyBuilder<T> {
 
@@ -87,6 +91,7 @@ public class TimelinePropertyBuilder<T> {
             getterMethod = getGetter(obj, fieldName);
         }
 
+        @SuppressWarnings("unchecked")
         public T get(Object obj, String fieldName) {
             try {
                 return (T) getterMethod.invoke(obj);
@@ -100,8 +105,10 @@ public class TimelinePropertyBuilder<T> {
     private Object target; // may be null
     private final String propertyName; // required
     private T from; // optional
+    private Supplier<T> fromSupplier;
     private boolean isFromCurrent;
     private T to; // must be optional because of KeyFrames
+    private Supplier<T> toSupplier;
     private PropertyInterpolator<T> interpolator; // optional
     private PropertyGetter<T> getter; // optional
     private PropertySetter<T> setter; // optional
@@ -119,10 +126,30 @@ public class TimelinePropertyBuilder<T> {
         if (this.isFromCurrent) {
             throw new IllegalArgumentException("from() cannot be called after fromCurrent()");
         }
+        if (this.fromSupplier != null) {
+            throw new IllegalArgumentException("from() cannot be called after fromSupplier()");
+        }
         if (this.keyFrames != null) {
             throw new IllegalArgumentException("from() cannot be called after goingThrough()");
         }
         this.from = startValue;
+        return this;
+    }
+
+    public TimelinePropertyBuilder<T> fromSupplier(Supplier<T> supplier) {
+        if (this.fromSupplier != null) {
+            throw new IllegalArgumentException("fromSupplier() can only be called once");
+        }
+        if (this.isFromCurrent) {
+            throw new IllegalArgumentException("fromSupplier() cannot be called after fromCurrent()");
+        }
+        if (this.from != null) {
+            throw new IllegalArgumentException("fromSupplier() cannot be called after from()");
+        }
+        if (this.keyFrames != null) {
+            throw new IllegalArgumentException("fromSupplier() cannot be called after goingThrough()");
+        }
+        this.fromSupplier = supplier;
         return this;
     }
 
@@ -132,6 +159,9 @@ public class TimelinePropertyBuilder<T> {
         }
         if (this.from != null) {
             throw new IllegalArgumentException("fromCurrent() cannot be called after from()");
+        }
+        if (this.fromSupplier != null) {
+            throw new IllegalArgumentException("fromCurrent() cannot be called after fromSupplier()");
         }
         if (this.keyFrames != null) {
             throw new IllegalArgumentException(
@@ -145,10 +175,27 @@ public class TimelinePropertyBuilder<T> {
         if (this.to != null) {
             throw new IllegalArgumentException("to() can only be called once");
         }
+        if (this.toSupplier != null) {
+            throw new IllegalArgumentException("to() cannot be called after toSupplier()");
+        }
         if (this.keyFrames != null) {
             throw new IllegalArgumentException("to() cannot be called after goingThrough()");
         }
         this.to = endValue;
+        return this;
+    }
+
+    public TimelinePropertyBuilder<T> toSupplier(Supplier<T> supplier) {
+        if (this.toSupplier != null) {
+            throw new IllegalArgumentException("toSupplier() can only be called once");
+        }
+        if (this.to != null) {
+            throw new IllegalArgumentException("toSupplier() cannot be called after to()");
+        }
+        if (this.keyFrames != null) {
+            throw new IllegalArgumentException("toSupplier() cannot be called after goingThrough()");
+        }
+        this.toSupplier = supplier;
         return this;
     }
 
@@ -201,59 +248,69 @@ public class TimelinePropertyBuilder<T> {
         if (this.from != null) {
             throw new IllegalArgumentException("goingThrough() cannot be called after from()");
         }
+        if (this.fromSupplier != null) {
+            throw new IllegalArgumentException("goingThrough() cannot be called after fromSupplier()");
+        }
         if (this.to != null) {
             throw new IllegalArgumentException("goingThrough() cannot be called after to()");
+        }
+        if (this.toSupplier != null) {
+            throw new IllegalArgumentException("goingThrough() cannot be called after toSupplier()");
         }
         this.keyFrames = keyFrames;
         return this;
     }
 
-    AbstractFieldInfo getFieldInfo(Object mainObject) {
+    AbstractFieldInfo<T> getFieldInfo(Object mainObject) {
         if (this.target == null) {
             this.target = mainObject;
         }
 
         if (this.keyFrames != null) {
-            return new KeyFramesFieldInfo(this.target, this.propertyName, this.keyFrames,
+            return new KeyFramesFieldInfo<>(this.target, this.propertyName, this.keyFrames,
                     this.setter);
         }
 
         if (this.isFromCurrent) {
             if (this.interpolator == null) {
-                this.interpolator = TridentConfig.getInstance().getPropertyInterpolator(this.to);
+                this.interpolator = TridentConfig.getInstance().getPropertyInterpolator(
+                        Collections.singleton((this.to != null) ? this.to : this.toSupplier.get()));
 
                 if (this.interpolator == null) {
                     throw new IllegalArgumentException(
                             "No interpolator found for " + this.to.getClass().getName());
                 }
             }
-            return new GenericFieldInfoTo(this.target, this.propertyName, this.to,
+            return new GenericFieldInfoTo<>(this.target, this.propertyName, this.to, this.toSupplier,
                     this.interpolator, this.getter, this.setter);
         }
 
         if (this.interpolator == null) {
-            this.interpolator = TridentConfig.getInstance().getPropertyInterpolator(this.from,
-                    this.to);
+            this.interpolator = TridentConfig.getInstance().getPropertyInterpolator(
+                    Arrays.asList((this.from != null) ? this.from : this.fromSupplier.get(),
+                            (this.to != null) ? this.to : this.toSupplier.get()));
 
             if (this.interpolator == null) {
                 throw new IllegalArgumentException("No interpolator found for "
                         + this.from.getClass().getName() + ":" + this.to.getClass().getName());
             }
         }
-        return new GenericFieldInfo(this.target, this.propertyName, this.from, this.to,
-                this.interpolator, this.setter);
+        return new GenericFieldInfo<>(this.target, this.propertyName, this.from, this.fromSupplier,
+                this.to, this.toSupplier, this.interpolator, this.setter);
     }
 
-    abstract class AbstractFieldInfo<F> {
+    abstract static class AbstractFieldInfo<F> {
         protected Object object;
 
         protected String fieldName;
 
-        protected PropertyGetter getter;
-        protected PropertySetter setter;
+        protected PropertyGetter<F> getter;
+        protected PropertySetter<F> setter;
 
         protected F from;
+        protected Supplier<F> fromSupplier;
         protected F to;
+        protected Supplier<F> toSupplier;
 
         AbstractFieldInfo(Object obj, String fieldName, PropertyGetter<F> pGetter,
                 PropertySetter<F> pSetter) {
@@ -264,12 +321,18 @@ public class TimelinePropertyBuilder<T> {
             this.setter = pSetter;
         }
 
-        void setValues(F from, F to) {
-            this.from = from;
-            this.to = to;
+        void setValues(F from, Supplier<F> fromSupplier, F to, Supplier<F> toSupplier) {
+            this.fromSupplier = fromSupplier;
+            this.from = (this.fromSupplier == null) ? from : this.fromSupplier.get();
+            this.toSupplier = toSupplier;
+            this.to = (this.toSupplier == null) ? to : this.toSupplier.get();
         }
 
         abstract void onStart();
+
+        abstract void updateTo();
+
+        abstract void updateFrom();
 
         abstract boolean isFromCurrent();
 
@@ -280,35 +343,44 @@ public class TimelinePropertyBuilder<T> {
             PropertyGetter<T> pGetter) {
         if (pGetter != null)
             return pGetter;
-        return new DefaultPropertyGetter(obj, fieldName);
+        return new DefaultPropertyGetter<>(obj, fieldName);
     }
 
     private static <T> PropertySetter<T> getPropertySetter(Object obj, String fieldName,
             PropertySetter<T> pSetter) {
         if (pSetter != null)
             return pSetter;
-        return new DefaultPropertySetter(obj, fieldName);
+        return new DefaultPropertySetter<>(obj, fieldName);
     }
 
-    private class GenericFieldInfoTo extends AbstractFieldInfo<Object> {
-        private PropertyInterpolator propertyInterpolator;
+    private static class GenericFieldInfoTo<T> extends AbstractFieldInfo<T> {
+        private PropertyInterpolator<T> propertyInterpolator;
 
-        private Object to;
-
-        GenericFieldInfoTo(Object obj, String fieldName, Object to,
-                PropertyInterpolator propertyInterpolator, PropertyGetter propertyGetter,
-                PropertySetter propertySetter) {
+        GenericFieldInfoTo(Object obj, String fieldName, T to, Supplier<T> toSupplier,
+                PropertyInterpolator<T> propertyInterpolator, PropertyGetter<T> propertyGetter,
+                PropertySetter<T> propertySetter) {
             super(obj, fieldName, getPropertyGetter(obj, fieldName, propertyGetter),
                     getPropertySetter(obj, fieldName, propertySetter));
             this.propertyInterpolator = propertyInterpolator;
-            this.to = to;
-            //System.out.println("Created @" + hashCode() + " for " + fieldName);
+            this.toSupplier = toSupplier;
+            this.to = (this.toSupplier == null) ? to : this.toSupplier.get();
         }
 
         @Override
         void onStart() {
             this.from = getter.get(object, fieldName);
-            //System.out.println("onStart on @" + hashCode());
+            this.updateTo();
+        }
+
+        @Override
+        void updateFrom() {
+        }
+
+        @Override
+        void updateTo() {
+            if (this.toSupplier != null) {
+                this.to = this.toSupplier.get();
+            }
         }
 
         @Override
@@ -320,7 +392,7 @@ public class TimelinePropertyBuilder<T> {
         void updateFieldValue(float timelinePosition) {
             //System.out.println("updateFieldValue on @" + hashCode());
             try {
-                Object value = this.propertyInterpolator.interpolate(from, to, timelinePosition);
+                T value = this.propertyInterpolator.interpolate(from, to, timelinePosition);
                 this.setter.set(this.object, this.fieldName, value);
             } catch (Throwable exc) {
                 System.err.println("Exception occurred in updating field '" + this.fieldName
@@ -332,18 +404,35 @@ public class TimelinePropertyBuilder<T> {
         }
     }
 
-    private class GenericFieldInfo extends AbstractFieldInfo<Object> {
-        private PropertyInterpolator propertyInterpolator;
+    private static class GenericFieldInfo<T> extends AbstractFieldInfo<T> {
+        private PropertyInterpolator<T> propertyInterpolator;
 
-        GenericFieldInfo(Object obj, String fieldName, Object from, Object to,
-                PropertyInterpolator propertyInterpolator, PropertySetter propertySetter) {
+        GenericFieldInfo(Object obj, String fieldName, T from, Supplier<T> fromSupplier,
+                T to, Supplier<T> toSupplier,
+                PropertyInterpolator<T> propertyInterpolator, PropertySetter<T> propertySetter) {
             super(obj, fieldName, null, getPropertySetter(obj, fieldName, propertySetter));
             this.propertyInterpolator = propertyInterpolator;
-            this.setValues(from, to);
+            this.setValues(from, fromSupplier, to, toSupplier);
         }
 
         @Override
         void onStart() {
+            this.updateFrom();
+            this.updateTo();
+        }
+
+        @Override
+        void updateFrom() {
+            if (this.fromSupplier != null) {
+                this.from = this.fromSupplier.get();
+            }
+        }
+
+        @Override
+        void updateTo() {
+            if (this.toSupplier != null) {
+                this.to = this.toSupplier.get();
+            }
         }
 
         @Override
@@ -354,7 +443,7 @@ public class TimelinePropertyBuilder<T> {
         @Override
         void updateFieldValue(float timelinePosition) {
             try {
-                Object value = this.propertyInterpolator.interpolate(from, to, timelinePosition);
+                T value = this.propertyInterpolator.interpolate(from, to, timelinePosition);
                 this.setter.set(this.object, this.fieldName, value);
             } catch (Throwable exc) {
                 System.err.println("Exception occurred in updating field '" + this.fieldName
@@ -366,17 +455,25 @@ public class TimelinePropertyBuilder<T> {
         }
     }
 
-    private class KeyFramesFieldInfo extends AbstractFieldInfo<Object> {
-        KeyFrames keyFrames;
+    private static class KeyFramesFieldInfo<T> extends AbstractFieldInfo<T> {
+        KeyFrames<? extends T> keyFrames;
 
-        KeyFramesFieldInfo(Object obj, String fieldName, KeyFrames keyFrames,
-                PropertySetter propertySetter) {
+        KeyFramesFieldInfo(Object obj, String fieldName, KeyFrames<? extends T> keyFrames,
+                PropertySetter<T> propertySetter) {
             super(obj, fieldName, null, getPropertySetter(obj, fieldName, propertySetter));
             this.keyFrames = keyFrames;
         }
 
         @Override
         void onStart() {
+        }
+
+        @Override
+        void updateFrom() {
+        }
+
+        @Override
+        void updateTo() {
         }
 
         @Override
@@ -388,7 +485,7 @@ public class TimelinePropertyBuilder<T> {
         void updateFieldValue(float timelinePosition) {
             if (this.setter != null) {
                 try {
-                    Object value = this.keyFrames.getValue(timelinePosition);
+                    T value = this.keyFrames.getValue(timelinePosition);
                     this.setter.set(this.object, this.fieldName, value);
                 } catch (Throwable exc) {
                     exc.printStackTrace();
@@ -400,7 +497,7 @@ public class TimelinePropertyBuilder<T> {
     private static Method getSetter(Object object, String propertyName) {
         String setterMethodName = "set" + Character.toUpperCase(propertyName.charAt(0))
                 + propertyName.substring(1);
-        Class oClazz = object.getClass();
+        Class<?> oClazz = object.getClass();
         while (oClazz != null) {
             for (Method m : oClazz.getMethods()) {
                 if (setterMethodName.equals(m.getName()) && (m.getParameterTypes().length == 1)
@@ -417,7 +514,7 @@ public class TimelinePropertyBuilder<T> {
     private static Method getGetter(Object object, String propertyName) {
         String getterMethodName = "get" + Character.toUpperCase(propertyName.charAt(0))
                 + propertyName.substring(1);
-        Class oClazz = object.getClass();
+        Class<?> oClazz = object.getClass();
         while (oClazz != null) {
             for (Method m : oClazz.getMethods()) {
                 if (getterMethodName.equals(m.getName()) && (m.getParameterTypes().length == 0)

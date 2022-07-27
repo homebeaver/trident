@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2020 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
@@ -29,15 +29,15 @@
  */
 package org.pushingpixels.trident.internal.interpolator;
 
+import org.pushingpixels.trident.api.interpolator.PropertyInterpolator;
+import org.pushingpixels.trident.api.interpolator.PropertyInterpolatorSource;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.pushingpixels.trident.api.interpolator.PropertyInterpolator;
-import org.pushingpixels.trident.api.interpolator.PropertyInterpolatorSource;
-
 public class CorePropertyInterpolators implements PropertyInterpolatorSource {
-    private Set<PropertyInterpolator> interpolators;
+    private Set<PropertyInterpolator<?>> interpolators;
 
     public CorePropertyInterpolators() {
         this.interpolators = new HashSet<>();
@@ -48,13 +48,13 @@ public class CorePropertyInterpolators implements PropertyInterpolatorSource {
     }
 
     @Override
-    public Set<PropertyInterpolator> getPropertyInterpolators() {
+    public Set<PropertyInterpolator<?>> getPropertyInterpolators() {
         return Collections.unmodifiableSet(this.interpolators);
     }
 
     private static class FloatPropertyInterpolator implements PropertyInterpolator<Float> {
         @Override
-        public Class getBasePropertyClass() {
+        public Class<Float> getBasePropertyClass() {
             return Float.class;
         }
 
@@ -66,7 +66,7 @@ public class CorePropertyInterpolators implements PropertyInterpolatorSource {
 
     private static class DoublePropertyInterpolator implements PropertyInterpolator<Double> {
         @Override
-        public Class getBasePropertyClass() {
+        public Class<Double> getBasePropertyClass() {
             return Double.class;
         }
 
@@ -78,7 +78,7 @@ public class CorePropertyInterpolators implements PropertyInterpolatorSource {
 
     private static class IntegerPropertyInterpolator implements PropertyInterpolator<Integer> {
         @Override
-        public Class getBasePropertyClass() {
+        public Class<Integer> getBasePropertyClass() {
             return Integer.class;
         }
 
@@ -90,7 +90,7 @@ public class CorePropertyInterpolators implements PropertyInterpolatorSource {
 
     private static class LongPropertyInterpolator implements PropertyInterpolator<Long> {
         @Override
-        public Class getBasePropertyClass() {
+        public Class<Long> getBasePropertyClass() {
             return Long.class;
         }
 
