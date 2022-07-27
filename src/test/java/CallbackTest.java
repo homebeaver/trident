@@ -21,7 +21,7 @@ public class CallbackTest extends junit.framework.TestCase {
 	
 	private static final Logger LOG = Logger.getLogger(CallbackTest.class.getName());
 	static final long DURATION = Timeline.DEFAULT_DURATION; //500;
-	static final int WAITFACTOR = 120; // % of DURATION
+	static final int WAITFACTOR = 125; // % of DURATION
 
 	//                     public class TimelineCallbackAdapter implements TimelineCallback {
 	public class TestHelloWorld extends TimelineCallbackAdapter {
