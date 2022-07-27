@@ -2,6 +2,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.pushingpixels.trident.Timeline;
+import org.pushingpixels.trident.Timeline.Builder;
 import org.pushingpixels.trident.Timeline.TimelineState;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 
@@ -16,7 +17,7 @@ import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 @RunWith(JUnit4.class)
 public class CallbackTest extends junit.framework.TestCase {
 	
-	static final long DURATION = 500;
+	static final long DURATION = Timeline.DEFAULT_DURATION; //500;
 	static final int WAITFACTOR = 120; // % of DURATION
 
 	//                     public class TimelineCallbackAdapter implements TimelineCallback {
@@ -51,10 +52,11 @@ public class CallbackTest extends junit.framework.TestCase {
 	@Test
 	public void testDefaultDuration() {
 		TestHelloWorld helloWorld = new TestHelloWorld();
-		Timeline timeline = new Timeline(helloWorld);
+        Builder tlb = Timeline.builder();
+//        tlb.addPropertyToInterpolate("value", 0.0f, 1.0f);  // not used!
+        Timeline timeline = tlb.build();
 		assertEquals(DURATION, timeline.getDuration());
-//		timeline.addPropertyToInterpolate("value", 0.0f, 1.0f); // not used!
-		timeline.addCallback(helloWorld);
+		tlb.addCallback(helloWorld);
 		
 		timeline.play();
 		try {

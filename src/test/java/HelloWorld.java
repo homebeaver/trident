@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2018 Trident Kirill Grouchnikov. All Rights Reserved.
+ * Copyright (c) 2005-2019 Radiance Kirill Grouchnikov. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
@@ -11,7 +11,7 @@
  *    this list of conditions and the following disclaimer in the documentation 
  *    and/or other materials provided with the distribution. 
  *     
- *  o Neither the name of Trident Kirill Grouchnikov nor the names of 
+ *  o Neither the name of the copyright holder nor the names of
  *    its contributors may be used to endorse or promote products derived 
  *    from this software without specific prior written permission. 
  *     
@@ -27,6 +27,8 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
+//package org.pushingpixels.demo.trident; // in Radiance
+
 import org.pushingpixels.trident.Timeline;
 
 public class HelloWorld {
@@ -39,9 +41,10 @@ public class HelloWorld {
 
     public static void main(String[] args) {
         HelloWorld helloWorld = new HelloWorld();
-        Timeline timeline = new Timeline(helloWorld);
-        timeline.addPropertyToInterpolate("value", 0.0f, 1.0f);
-        timeline.play();
+
+        Timeline.builder(helloWorld)
+                .addPropertyToInterpolate("value", 0.0f, 1.0f)
+                .play();
 
         try {
             Thread.sleep(3000);

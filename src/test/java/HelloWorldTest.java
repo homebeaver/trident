@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.pushingpixels.trident.Timeline;
+import org.pushingpixels.trident.Timeline.Builder;
 
 @RunWith(JUnit4.class)
 public class HelloWorldTest extends junit.framework.TestCase {
@@ -32,7 +33,7 @@ public class HelloWorldTest extends junit.framework.TestCase {
 //		System.out.println("@After");
 //	}
 
-	static final long DURATION = 500;
+	static final long DURATION = Timeline.DEFAULT_DURATION; //500;
 	static final int WAITFACTOR = 120; // % of DURATION
 
 	public class TestHelloWorld {
@@ -51,8 +52,9 @@ public class HelloWorldTest extends junit.framework.TestCase {
 	@Test
 	public void testDefaultDuration() {
 		TestHelloWorld helloWorld = new TestHelloWorld();
-		Timeline timeline = new Timeline(helloWorld);
-		timeline.addPropertyToInterpolate("value", 0.0f, 1.0f);
+        Builder tlb = Timeline.builder();
+        tlb.addPropertyToInterpolate("value", 0.0f, 1.0f);
+        Timeline timeline = tlb.build();
 		assertEquals(DURATION, timeline.getDuration());
 		
 		timeline.play();
